@@ -1,0 +1,6 @@
+# Residencial Alta Vista — fallback das rotas React para Apache/HostGator
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
