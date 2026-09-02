@@ -10,7 +10,8 @@ jobs:
     steps:
       - name: Baixar o código do repositório
         uses: actions/checkout@v4
-        with: fetch-depth: 0
+        with: 
+          fetch-depth: 0
 
       - name: Instalar pnpm
         uses: pnpm/action-setup@v4
