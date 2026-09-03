@@ -10,30 +10,30 @@ import {
   MessageCircle, MoveRight, Play, Ruler, ShieldCheck, Sparkles, X
 } from "lucide-react";
 
-const hero = "/assets/alta-vista-hero.jpg";
-const interior = "/assets/alta-vista-interior.jpg";
-const vista = "/assets/alta-vista-vista.jpg";
-const cityAerial = "/assets/alta-vista-city-aerial.jpg";
+const hero = "/assets/alta-vista-hero.webp";
+const interior = "/assets/alta-vista-interior.webp";
+const vista = "/assets/alta-vista-vista.webp";
+const cityAerial = "/assets/alta-vista-city-aerial.webp";
 const symbol = "/assets/alta-vista-symbol.png";
 const mapUrl = "https://maps.app.goo.gl/Qcok5Cx8K5L3pjT76";
 const whatsapp = "https://wa.me/5548991223600?text=Ol%C3%A1%2C%20quero%20conhecer%20as%20unidades%20do%20Residencial%20Alta%20Vista.";
 const tableFile = "/assets/Res Alta Vista - Tabela de Preco.pdf";
-const plantaFile = "/assets/planta.jpg";
+const plantaFile = "/assets/planta.webp";
 const guiaFile = "/assets/guia_da_mudanca_tranquila.pdf";
 const droneFile = "/assets/drone.mp4";
 const galleryPhotos = {
-  fachada2: "/assets/gallery-fachada2.jpg",
-  sala: "/assets/gallery-sala.jpg",
-  churrasqueira: "/assets/gallery-churrasqueira.jpg",
-  banheiro: "/assets/gallery-banheiro.jpg",
-  garagem: "/assets/gallery-garagem.jpg",
+  fachada2: "/assets/gallery-fachada2.webp",
+  sala: "/assets/gallery-sala.webp",
+  churrasqueira: "/assets/gallery-churrasqueira.webp",
+  banheiro: "/assets/gallery-banheiro.webp",
+  garagem: "/assets/gallery-garagem.webp",
 };
 const decorPhotos = [
-  { src: "/assets/decor-quarto.jpg", label: "Dormitório" },
-  { src: "/assets/decor-sala.jpg", label: "Sala de estar" },
-  { src: "/assets/decor-sacada.jpg", label: "Sacada e cozinha" },
-  { src: "/assets/decor-banheiro.jpg", label: "Banheiro" },
-  { src: "/assets/decor-closet.jpg", label: "Closet / suíte" },
+  { src: "/assets/decor-quarto.webp", label: "Dormitório" },
+  { src: "/assets/decor-sala.webp", label: "Sala de estar" },
+  { src: "/assets/decor-sacada.webp", label: "Sacada e cozinha" },
+  { src: "/assets/decor-banheiro.webp", label: "Banheiro" },
+  { src: "/assets/decor-closet.webp", label: "Closet / suíte" },
 ];
 const decorCredit = { name: "Anaíse Breda Arquitetura", url: "https://www.instagram.com/anaisebredaarquitetura/" };
 const siteUrl = "https://www.altavistamarau.com.br";
@@ -202,7 +202,7 @@ function FAQ() { const rows = [["O edifício está pronto?", "Sim. O edifício e
 
 function AvailabilityPage() { useDocumentMeta("Unidades disponíveis e preços | Residencial Alta Vista", "Confira as 5 unidades prontas do Residencial Alta Vista em Marau/RS, com condição especial de pagamento e tabela oficial para download.", "/disponibilidade"); return <Layout><PageHero kind="disponibilidade" eyebrow="UNIDADES DISPONÍVEIS" title="Escolha o andar. O próximo passo é seu." copy="Cinco apartamentos prontos, com a mesma planta e condições claras para uma decisão segura." image={hero} /><section className="section-pad availability-page"><div className="container"><div className="notice"><ShieldCheck size={20} /><p><strong>Imóvel pronto e documentado.</strong> Consulte a disponibilidade atual diretamente com a construtora.</p></div><div className="unit-table">{units.map(unit => <div className="unit-row" id={unit.id} key={unit.id}><div><span className="unit-id">{unit.id}</span><div><small>{unit.floor}</small><strong>{unit.position}</strong></div></div><div className="unit-price-block"><span className="unit-price-tag">Condição especial</span><span className="unit-old-price">De {unit.listPrice}</span><strong className="unit-price">{unit.price}</strong></div><WhatsAppButton className="button button-outline">Tenho interesse <ArrowUpRight size={15} /></WhatsAppButton></div>)}</div><div className="payment-grid"><div><Eyebrow>CONDIÇÕES DE PAGAMENTO</Eyebrow><h3>Direto ao ponto.</h3><p>Pagamento à vista ou 20% de entrada mais financiamento bancário. Para detalhes e simulação, fale com a construtora.</p></div><div className="pdf-callout"><FileText size={25} /><div><strong>Consulte a tabela completa</strong><span>PDF oficial de preços e condições</span></div><a href={tableFile} download aria-label="Baixar tabela comercial"><Download size={19} /></a></div></div></div></section></Layout>; }
 
-function LocationPage() { useDocumentMeta("Localização em Marau/RS | Residencial Alta Vista", "Rua A, nº 46, Marau/RS. Perto de escolas, hospital, praças e comércio. Veja o mapa e os pontos de interesse do entorno do Alta Vista.", "/localizacao"); return <Layout><PageHero kind="localizacao" eyebrow="MARAU / RS" title="Um endereço conectado ao que importa." copy="Rua A, nº 46. Próximo da vida urbana, dos serviços e dos espaços que fazem Marau acontecer." image={cityAerial} /><section className="section-pad"><div className="container location-grid"><div><SectionTitle eyebrow="NO ENTORNO" title="A cidade por perto. O horizonte também." copy="O Alta Vista está em uma região que aproxima educação, saúde, lazer, gastronomia e áreas verdes da sua rotina." /><div className="places"><a href={mapsSearch(pointsOfInterest[1].query)} target="_blank" rel="noreferrer"><Landmark /> Escola Estadual de Ensino Médio Anchieta <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[0].query)} target="_blank" rel="noreferrer"><ShieldCheck /> Hospital Cristo Redentor <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[2].query)} target="_blank" rel="noreferrer"><MapPin /> Praça Central <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[3].query)} target="_blank" rel="noreferrer"><MapPin /> Parque Lauro Ricieri Bortolon <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[4].query)} target="_blank" rel="noreferrer"><Sparkles /> AABB Marau <ExternalLink size={14} /></a></div></div><div className="map-card"><iframe className="site-map" title="Mapa do Residencial Alta Vista em Marau" src="https://www.google.com/maps?q=-28.4343386,-52.2095211&z=15&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><div className="map-caption"><MapPin size={15} /> Residencial Alta Vista · Rua A, nº 46</div><a href={mapUrl} target="_blank" rel="noreferrer" className="button button-dark">Abrir no Google Maps <ExternalLink size={16} /></a></div></div></section><section className="section-pad signage-section"><div className="container signage-grid"><img src="/assets/logo-altavista.jpg" alt="Placa de identificação do Residencial Alta Vista, nº 46" className="signage-image" /><div><Eyebrow>ENDEREÇO CONFIRMADO</Eyebrow><h3>Fácil de achar, fácil de reconhecer.</h3><p>A entrada do edifício já está identificada — Residencial Alta Vista, número 46, Rua A.</p></div></div></section></Layout>; }
+function LocationPage() { useDocumentMeta("Localização em Marau/RS | Residencial Alta Vista", "Rua A, nº 46, Marau/RS. Perto de escolas, hospital, praças e comércio. Veja o mapa e os pontos de interesse do entorno do Alta Vista.", "/localizacao"); return <Layout><PageHero kind="localizacao" eyebrow="MARAU / RS" title="Um endereço conectado ao que importa." copy="Rua A, nº 46. Próximo da vida urbana, dos serviços e dos espaços que fazem Marau acontecer." image={cityAerial} /><section className="section-pad"><div className="container location-grid"><div><SectionTitle eyebrow="NO ENTORNO" title="A cidade por perto. O horizonte também." copy="O Alta Vista está em uma região que aproxima educação, saúde, lazer, gastronomia e áreas verdes da sua rotina." /><div className="places"><a href={mapsSearch(pointsOfInterest[1].query)} target="_blank" rel="noreferrer"><Landmark /> Escola Estadual de Ensino Médio Anchieta <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[0].query)} target="_blank" rel="noreferrer"><ShieldCheck /> Hospital Cristo Redentor <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[2].query)} target="_blank" rel="noreferrer"><MapPin /> Praça Central <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[3].query)} target="_blank" rel="noreferrer"><MapPin /> Parque Lauro Ricieri Bortolon <ExternalLink size={14} /></a><a href={mapsSearch(pointsOfInterest[4].query)} target="_blank" rel="noreferrer"><Sparkles /> AABB Marau <ExternalLink size={14} /></a></div></div><div className="map-card"><iframe className="site-map" title="Mapa do Residencial Alta Vista em Marau" src="https://www.google.com/maps?q=-28.4343386,-52.2095211&z=15&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /><div className="map-caption"><MapPin size={15} /> Residencial Alta Vista · Rua A, nº 46</div><a href={mapUrl} target="_blank" rel="noreferrer" className="button button-dark">Abrir no Google Maps <ExternalLink size={16} /></a></div></div></section><section className="section-pad signage-section"><div className="container signage-grid"><img src="/assets/logo-altavista.webp" alt="Placa de identificação do Residencial Alta Vista, nº 46" className="signage-image" /><div><Eyebrow>ENDEREÇO CONFIRMADO</Eyebrow><h3>Fácil de achar, fácil de reconhecer.</h3><p>A entrada do edifício já está identificada — Residencial Alta Vista, número 46, Rua A.</p></div></div></section></Layout>; }
 
 function MaterialsPage() { useDocumentMeta("Materiais para download | Residencial Alta Vista", "Baixe a tabela comercial, a planta do apartamento, o guia da mudança e assista ao vídeo de drone do Residencial Alta Vista.", "/materiais"); return <Layout><PageHero kind="materiais" eyebrow="MATERIAIS" title="Tudo o que você precisa para decidir com clareza." copy="Materiais oficiais do Residencial Alta Vista para compradores, parceiros e corretores." image={interior} /><section className="section-pad"><div className="container materials-list"><Material icon={<FileText />} title="Tabela comercial" description="Preços e condições oficiais das cinco unidades anunciadas." href={tableFile} label="Baixar PDF" /><Material icon={<Ruler />} title="Planta do apartamento" description="Visualize a distribuição dos ambientes e a configuração do imóvel." href={plantaFile} label="Baixar planta" /><Material icon={<Sparkles />} title="Guia da mudança tranquila" description="Um material da construtora para preparar a chegada ao novo endereço." href={guiaFile} label="Baixar guia" /><Material icon={<Play />} title="Vídeo de drone" description="Conheça o edifício e o entorno em uma perspectiva aérea." href={droneFile} label="Abrir vídeo" /></div></section></Layout>; }
 function Material({ icon, title, description, href, label }: { icon: React.ReactNode; title: string; description: string; href: string; label: string }) { return <a className="material-row" href={href} download={label !== "Abrir vídeo"}><span className="material-icon">{icon}</span><span className="material-copy"><strong>{title}</strong><p>{description}</p></span><span className="material-action">{label} <ArrowUpRight size={16} /></span></a>; }
