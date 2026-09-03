@@ -1,6 +1,12 @@
 # Residencial Alta Vista — fallback das rotas React para Apache/HostGator
 RewriteEngine On
 RewriteBase /
+
+# Força https:// e www. como versão única e canônica
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^altavistamarau\.com\.br$ [NC]
+RewriteRule ^ https://www.altavistamarau.com.br%{REQUEST_URI} [L,R=301]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
