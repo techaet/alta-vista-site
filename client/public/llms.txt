@@ -1,0 +1,21 @@
+# Residencial Alta Vista
+
+> Empreendimento residencial de padrão superior em Marau/RS, com apartamentos prontos de 76,90 m² privativos (137,87 m² totais), 2 dormitórios (1 suíte), sacada com churrasqueira e 2 vagas de garagem. Construído pela Fioravanso e Zanchet Construtora e Incorporadora.
+
+## Páginas principais
+
+- [Início](https://www.altavistamarau.com.br/): Apresentação geral do empreendimento e chamada para contato.
+- [O Residencial](https://www.altavistamarau.com.br/residencial): Conceito, infraestrutura e diferenciais do edifício.
+- [Apartamentos](https://www.altavistamarau.com.br/apartamentos): Planta, ambientes, acabamentos e galeria de fotos reais.
+- [Disponibilidade](https://www.altavistamarau.com.br/disponibilidade): As cinco unidades disponíveis, com preços e condições.
+- [Localização](https://www.altavistamarau.com.br/localizacao): Endereço, mapa e pontos de interesse em Marau.
+- [Materiais](https://www.altavistamarau.com.br/materiais): Tabela de preços em PDF, planta, guia de mudança e vídeo.
+- [Blog](https://www.altavistamarau.com.br/blog): Conteúdo sobre morar e investir em Marau.
+- [Contato](https://www.altavistamarau.com.br/contato): Canais de atendimento comercial.
+
+## Dados essenciais
+
+- Endereço: Rua A, nº 46, Marau/RS
+- Construtora: Fioravanso e Zanchet Construtora e Incorporadora Ltda. (CNPJ 32.149.779/0001-79)
+- Unidades disponíveis: 501, 502, 504 (5º andar) e 601, 604 (6º andar)
+- Contato: WhatsApp +55 (48) 99122-3600
