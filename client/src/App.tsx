@@ -424,4 +424,22 @@ function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial
 function PageHero({ kind = "default", eyebrow, title, copy, image }: { kind?: string; eyebrow: string; title: string; copy: string; image: string }) { return <section className={`page-hero page-hero-${kind}`}><img className="page-hero-image" src={image} alt="" fetchPriority="high" decoding="async" /><div className="page-hero-overlay" /><div className="page-hero-rule" /><div className="container page-hero-content"><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1><p>{copy}</p></div></section>; }
 function NotFound() { return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>404</Eyebrow><h1>Essa página saiu da planta.</h1><p>O endereço que você tentou acessar não está disponível.</p><Link href="/" className="button button-dark">Voltar ao início <ArrowUpRight size={16} /></Link></div></section></Layout>; }
 
-export default function App() { return <Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch>; }
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+function GaPageViewTracker() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.gtag?.("event", "page_view", {
+      page_path: location,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }, [location]);
+  return null;
+}
+
+export default function App() { return <><GaPageViewTracker /><Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch></>; }
