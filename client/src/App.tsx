@@ -9,7 +9,7 @@ import {
   Download, ExternalLink, FileText, Instagram, Landmark, MapPin, Menu,
   MessageCircle, MoveRight, Play, Ruler, ShieldCheck, Sparkles, X
 } from "lucide-react";
-import { novosArtigos } from "./content/blog-novos";
+import { artigos, type Artigo } from "./content/artigos";
 
 const hero = "/assets/alta-vista-hero.webp";
 const interior = "/assets/alta-vista-interior.webp";
@@ -39,45 +39,60 @@ const decorPhotos = [
 const decorCredit = { name: "Anaíse Breda Arquitetura", url: "https://www.instagram.com/anaisebredaarquitetura/" };
 const siteUrl = "https://www.altavistamarau.com.br";
 
-function useDocumentMeta(title: string, description: string, path: string) {
+const shareImage = "/assets/alta-vista-hero-share.jpg";
+
+// No build, scripts/prerender.mjs renderiza cada rota no servidor; como useEffect não roda lá,
+// os hooks abaixo registram título/meta/JSON-LD aqui para o prerender escrever no <head>.
+export const ssrHead = { title: "", description: "", path: "/", image: shareImage, noindex: false, jsonLd: [] as object[] };
+const isServer = typeof document === "undefined";
+
+function setMeta(keyAttr: "name" | "property" | "rel", key: string, value: string) {
+  const tag = keyAttr === "rel" ? "link" : "meta";
+  let el = document.querySelector(`${tag}[${keyAttr}="${key}"]`);
+  if (!el) {
+    el = document.createElement(tag);
+    el.setAttribute(keyAttr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute(tag === "link" ? "href" : "content", value);
+}
+
+function useJsonLd(data: object[]) {
+  if (isServer) ssrHead.jsonLd.push(...data);
+  useEffect(() => {
+    // remove também os que vieram do HTML pré-renderizado, para não duplicar
+    document.querySelectorAll("script[data-ld]").forEach(s => s.remove());
+    const scripts = data.map(d => {
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.dataset.ld = "";
+      script.textContent = JSON.stringify(d);
+      document.head.appendChild(script);
+      return script;
+    });
+    return () => scripts.forEach(s => s.remove());
+  }, [data]);
+}
+
+function useNoindex() {
+  if (isServer) ssrHead.noindex = true;
+  useEffect(() => {
+    setMeta("name", "robots", "noindex");
+    return () => document.querySelector('meta[name="robots"]')?.remove();
+  }, []);
+}
+
+function useDocumentMeta(title: string, description: string, path: string, image = shareImage) {
+  if (isServer) Object.assign(ssrHead, { title, description, path, image });
   useEffect(() => {
     document.title = title;
-    let desc = document.querySelector('meta[name="description"]');
-    if (!desc) {
-      desc = document.createElement("meta");
-      desc.setAttribute("name", "description");
-      document.head.appendChild(desc);
-    }
-    desc.setAttribute("content", description);
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", `${siteUrl}${path}`);
-    let ogTitle = document.querySelector('meta[property="og:title"]');
-    if (!ogTitle) {
-      ogTitle = document.createElement("meta");
-      ogTitle.setAttribute("property", "og:title");
-      document.head.appendChild(ogTitle);
-    }
-    ogTitle.setAttribute("content", title);
-    let ogDesc = document.querySelector('meta[property="og:description"]');
-    if (!ogDesc) {
-      ogDesc = document.createElement("meta");
-      ogDesc.setAttribute("property", "og:description");
-      document.head.appendChild(ogDesc);
-    }
-    ogDesc.setAttribute("content", description);
-    let ogUrl = document.querySelector('meta[property="og:url"]');
-    if (!ogUrl) {
-      ogUrl = document.createElement("meta");
-      ogUrl.setAttribute("property", "og:url");
-      document.head.appendChild(ogUrl);
-    }
-    ogUrl.setAttribute("content", `${siteUrl}${path}`);
-  }, [title, description, path]);
+    setMeta("name", "description", description);
+    setMeta("rel", "canonical", `${siteUrl}${path}`);
+    setMeta("property", "og:title", title);
+    setMeta("property", "og:description", description);
+    setMeta("property", "og:url", `${siteUrl}${path}`);
+    setMeta("property", "og:image", `${siteUrl}${image}`);
+  }, [title, description, path, image]);
 }
 const pointsOfInterest = [
   { label: "Hospital Cristo Redentor", query: "Hospital Cristo Redentor, Marau, RS" },
@@ -88,7 +103,9 @@ const pointsOfInterest = [
 ];
 const mapsSearch = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 
-const units = [
+// Fonte única de preços/unidades. Ao mudar, atualize também client/public/llms.txt e o PDF da tabela
+// (o build falha se o llms.txt não tiver os mesmos preços).
+export const units = [
   { id: "502", floor: "5º andar", position: "Apartamento pronto", listPrice: "R$ 513.299,31", price: "R$ 410.000" },
   { id: "504", floor: "5º andar", position: "Apartamento pronto", listPrice: "R$ 513.299,31", price: "R$ 410.000" },
   { id: "601", floor: "6º andar", position: "Apartamento pronto", listPrice: "R$ 519.508,89", price: "R$ 425.000" },
@@ -107,14 +124,9 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 const priceNumber = (value: string) => Number(value.replace(/\D/g, ""));
 const unitPrices = units.map(unit => priceNumber(unit.price));
 
-const legacyArticles = [
-  { slug: "apartamento-pronto-em-marau", category: "MORADIA", title: "Apartamento pronto em Marau: quais são as vantagens?", excerpt: "Comprar um imóvel finalizado muda a relação entre expectativa, decisão e o momento de começar uma nova rotina.", image: interior, date: "08 set 2026" },
-  { slug: "dois-dormitorios-com-suite", category: "GUIA DE COMPRA", title: "O que observar em um apartamento de dois dormitórios com suíte?", excerpt: "Uma leitura prática sobre planta, integração, iluminação, conforto e os detalhes que fazem diferença todos os dias.", image: vista, date: "05 set 2026" },
-  { slug: "morar-ou-investir-em-marau", category: "MARAU", title: "Morar ou investir em Marau: como avaliar um imóvel pronto?", excerpt: "Os critérios que ajudam a olhar para localização, estado do imóvel, custos e objetivo de compra com mais clareza.", image: hero, date: "02 set 2026" },
-];
-
-type Article = { slug: string; category: string; title: string; excerpt: string; image: string; date: string; html?: string; jsonLd?: Record<string, unknown>[]; related?: { title: string; href: string }[] };
-const articles: Article[] = [...novosArtigos, ...legacyArticles];
+type Article = Artigo;
+const articles = artigos;
+export const staticRoutes = ["/", "/residencial", "/apartamentos", "/disponibilidade", "/localizacao", "/materiais", "/blog", "/contato", "/privacidade"];
 
 function Brand({ light = false }: { light?: boolean }) {
   return <Link href="/" className={`brand ${light ? "brand-light" : ""}`} aria-label="Residencial Alta Vista — início">
@@ -166,42 +178,35 @@ function Eyebrow({ children }: { children: React.ReactNode }) { return <p classN
 function SectionTitle({ eyebrow, title, copy, align = "left" }: { eyebrow: string; title: string; copy?: string; align?: "left" | "right" }) { return <div className={`section-title align-${align}`}><Eyebrow>{eyebrow}</Eyebrow><h2>{title}</h2>{copy && <p>{copy}</p>}</div>; }
 function WhatsAppButton({ children = "Falar com a construtora", className = "button button-dark" }: { children?: React.ReactNode; className?: string }) { return <a className={className} href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={17} />{children}</a>; }
 
+const homeLd = [{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Construtora Fioravanso e Zanchet Ltda.",
+  url: siteUrl,
+  telephone: "+55 48 99122-3600",
+  email: "fzmarau@gmail.com",
+  areaServed: "Marau, RS",
+  address: { "@type": "PostalAddress", streetAddress: "Rua A, nº 46", addressLocality: "Marau", addressRegion: "RS", addressCountry: "BR" },
+  sameAs: ["https://www.instagram.com/altavista_fz/", "https://www.facebook.com/altavista.marau.rs"],
+  makesOffer: {
+    "@type": "AggregateOffer",
+    itemOffered: {
+      "@type": "Apartment",
+      name: "Residencial Alta Vista",
+      numberOfRooms: 2,
+      floorSize: { "@type": "QuantitativeValue", value: 76.9, unitCode: "MTK" },
+      address: { "@type": "PostalAddress", streetAddress: "Rua A, nº 46", addressLocality: "Marau", addressRegion: "RS", addressCountry: "BR" },
+    },
+    priceCurrency: "BRL",
+    lowPrice: String(Math.min(...unitPrices)),
+    highPrice: String(Math.max(...unitPrices)),
+    offerCount: units.length,
+    availability: "https://schema.org/InStock",
+  },
+}];
 function Home() {
   useDocumentMeta("Residencial Alta Vista · Apartamentos prontos em Marau/RS", "Apartamentos de 76,90 m² privativos, suíte, sacada com churrasqueira e 2 vagas, prontos para morar em Marau/RS. Condição especial disponível.", "/");
-  useEffect(() => {
-    const id = "ld-json-realestate";
-    if (document.getElementById(id)) return;
-    const script = document.createElement("script");
-    script.id = id;
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "RealEstateAgent",
-      name: "Construtora Fioravanso e Zanchet Ltda.",
-      url: siteUrl,
-      telephone: "+55 48 99122-3600",
-      email: "fzmarau@gmail.com",
-      areaServed: "Marau, RS",
-      address: { "@type": "PostalAddress", streetAddress: "Rua A, nº 46", addressLocality: "Marau", addressRegion: "RS", addressCountry: "BR" },
-      sameAs: ["https://www.instagram.com/altavista_fz/", "https://www.facebook.com/altavista.marau.rs"],
-      makesOffer: {
-        "@type": "AggregateOffer",
-        itemOffered: {
-          "@type": "Apartment",
-          name: "Residencial Alta Vista",
-          numberOfRooms: 2,
-          floorSize: { "@type": "QuantitativeValue", value: 76.9, unitCode: "MTK" },
-          address: { "@type": "PostalAddress", streetAddress: "Rua A, nº 46", addressLocality: "Marau", addressRegion: "RS", addressCountry: "BR" },
-        },
-        priceCurrency: "BRL",
-        lowPrice: String(Math.min(...unitPrices)),
-        highPrice: String(Math.max(...unitPrices)),
-        offerCount: units.length,
-        availability: "https://schema.org/InStock",
-      },
-    });
-    document.head.appendChild(script);
-  }, []);
+  useJsonLd(homeLd);
   return <Layout><main>
     <section className="hero">
       <img className="hero-image" src={hero} alt="Fachada do Residencial Alta Vista" fetchPriority="high" decoding="async" />
@@ -254,27 +259,33 @@ function Material({ icon, title, description, href, label }: { icon: React.React
 
 function BlogPage() { useDocumentMeta("Blog | Residencial Alta Vista", "Conteúdos sobre morar em Marau/RS, comprar um apartamento pronto e o que observar antes de decidir. Blog do Residencial Alta Vista.", "/blog"); return <Layout><PageHero kind="blog" eyebrow="BLOG ALTA VISTA" title="Ideias para escolher melhor onde viver." copy="Conteúdo para entender o imóvel, a cidade e as decisões que acompanham um novo endereço." image={hero} /><section className="section-pad"><div className="container blog-list"><div className="blog-feature"><ArticleCard article={articles[0]} featured expanded /></div><div className="blog-side">{articles.slice(1).map(a => <ArticleCard article={a} key={a.slug} />)}</div></div></section></Layout>; }
 function ArticlePage({ slug }: { slug: string }) {
-  const article = articles.find(a => a.slug === slug) || articles[0];
-  useDocumentMeta(`${article.title} | Blog Alta Vista`, article.excerpt, `/blog/${article.slug}`);
-  useEffect(() => {
-    if (!article.jsonLd) return;
-    const scripts = article.jsonLd.map((data, i) => {
-      const script = document.createElement("script");
-      script.type = "application/ld+json";
-      script.id = `ld-article-${i}`;
-      script.textContent = JSON.stringify(data);
-      document.head.appendChild(script);
-      return script;
-    });
-    return () => { scripts.forEach(script => script.remove()); };
-  }, [article]);
-  const related = article.related ?? articles.filter(a => a.slug !== article.slug).map(a => ({ title: a.title, href: `/blog/${a.slug}` }));
-  return <Layout><article className="article-page"><div className="article-cover" style={{ backgroundImage: `url(${article.image})` }}><div className="article-cover-overlay" /><div className="container article-cover-content"><Eyebrow>{article.category}</Eyebrow><h1>{article.title}</h1><span>{article.date} · Residencial Alta Vista</span></div></div><div className="container article-body">{article.html ? <div className="article-prose" dangerouslySetInnerHTML={{ __html: article.html }} /> : <div className="article-prose"><p className="lead">{article.excerpt}</p><h2>Uma decisão que começa antes da mudança</h2><p>Escolher um apartamento é olhar para o espaço, mas também para o tempo que ele devolve. Quando o imóvel está pronto, é possível conhecer a realidade do projeto, visualizar os ambientes e planejar a próxima etapa com mais segurança.</p><p>Em Marau, um endereço bem conectado pode simplificar a rotina sem abrir mão de tranquilidade. Serviços, saúde, educação e lazer próximos ajudam a transformar a localização em qualidade de vida — todos os dias, não apenas na visita.</p><h2>O que observar no Alta Vista</h2><p>Os apartamentos combinam 76,90 m² privativos (137,87 m² com garagem e área comum), dois dormitórios com uma suíte, dois banheiros, ambientes integrados e sacada com churrasqueira. O edifício pronto soma elevador, duas vagas e uma série de preparações que evitam adaptações futuras.</p><blockquote>“Cada detalhe pensado para você” ganha significado quando conforto, funcionalidade e clareza comercial aparecem juntos.</blockquote><h2>Conheça de perto</h2><p>As {numWords.f[units.length]} unidades anunciadas possuem a mesma configuração e estão disponíveis em dois patamares de preço. Para consultar a tabela oficial, visualizar a planta ou agendar uma conversa, fale diretamente com a construtora.</p><WhatsAppButton className="button button-dark">Falar sobre as unidades <ArrowUpRight size={16} /></WhatsAppButton></div>}<aside className="article-aside"><Eyebrow>LEIA TAMBÉM</Eyebrow>{related.map(r => <Link href={r.href} key={r.href}>{r.title}<ArrowUpRight size={15} /></Link>)}</aside></div></article></Layout>;
+  const article = articles.find(a => a.slug === slug);
+  if (!article) return <NotFound />;
+  return <ArticleView article={article} />;
+}
+function ArticleView({ article }: { article: Article }) {
+  useDocumentMeta(`${article.title} | Blog Alta Vista`, article.excerpt, `/blog/${article.slug}`, article.image);
+  useJsonLd(article.jsonLd);
+  const related = article.related;
+  return <Layout><article className="article-page"><div className="article-cover" style={{ backgroundImage: `url(${article.image})` }}><div className="article-cover-overlay" /><div className="container article-cover-content"><Eyebrow>{article.category}</Eyebrow><h1>{article.title}</h1><span>{article.date} · Residencial Alta Vista</span></div></div><div className="container article-body"><div className="article-prose" dangerouslySetInnerHTML={{ __html: article.html }} /><aside className="article-aside"><Eyebrow>LEIA TAMBÉM</Eyebrow>{related.map(r => <Link href={r.href} key={r.href}>{r.title}<ArrowUpRight size={15} /></Link>)}</aside></div></article></Layout>;
 }
 
 function ContactPage() { useDocumentMeta("Contato | Residencial Alta Vista", "Fale com a Construtora Fioravanso e Zanchet pelo WhatsApp, telefone ou e-mail e agende uma visita ao Residencial Alta Vista em Marau/RS.", "/contato"); return <Layout><PageHero kind="contato" eyebrow="CONTATO" title="Vamos conversar sobre o seu próximo endereço." copy="Leonardo S. Fioravanso atende pelo WhatsApp, e-mail e redes sociais da construtora." image={interior} /><section className="section-pad contact-page"><div className="container contact-detail"><div><Eyebrow>ATENDIMENTO COMERCIAL</Eyebrow><h2>Uma conversa objetiva para encontrar a unidade certa.</h2><p>Agende uma visita, tire dúvidas sobre a planta ou consulte as condições de pagamento diretamente com a construtora.</p><WhatsAppButton className="button button-dark">Chamar no WhatsApp <MessageCircle size={17} /></WhatsAppButton></div><div className="contact-card"><span className="contact-avatar">LF</span><strong>Leonardo S. Fioravanso</strong><small>Gerente comercial</small><a href="tel:+5548991223600">+55 (48) 99122-3600</a><a href="mailto:fzmarau@gmail.com">fzmarau@gmail.com</a><a href="https://www.instagram.com/altavista_fz/" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={15} /></a><a href="https://www.facebook.com/altavista.marau.rs" target="_blank" rel="noreferrer">Facebook <ArrowUpRight size={15} /></a></div></div></section></Layout>; }
 function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial Alta Vista", "Como a Construtora Fioravanso e Zanchet trata os dados de contato dos visitantes do site do Residencial Alta Vista.", "/privacidade"); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>TRANSPARÊNCIA</Eyebrow><h1>Política de privacidade</h1><p>Este site utiliza links de contato para facilitar o atendimento da Construtora Fioravanso e Zanchet Ltda. Ao iniciar uma conversa por WhatsApp, e-mail ou rede social, os dados passam a ser tratados pela respectiva plataforma e pela construtora para fins de atendimento comercial.</p><p>O site não possui formulário próprio nem área autenticada. Para dúvidas sobre o uso de dados, entre em contato pelo e-mail fzmarau@gmail.com.</p></div></section></Layout>; }
 function PageHero({ kind = "default", eyebrow, title, copy, image }: { kind?: string; eyebrow: string; title: string; copy: string; image: string }) { return <section className={`page-hero page-hero-${kind}`}><img className="page-hero-image" src={image} alt="" fetchPriority="high" decoding="async" /><div className="page-hero-overlay" /><div className="page-hero-rule" /><div className="container page-hero-content"><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1><p>{copy}</p></div></section>; }
-function NotFound() { return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>404</Eyebrow><h1>Essa página saiu da planta.</h1><p>O endereço que você tentou acessar não está disponível.</p><Link href="/" className="button button-dark">Voltar ao início <ArrowUpRight size={16} /></Link></div></section></Layout>; }
+function NotFound() { useDocumentMeta("Página não encontrada | Residencial Alta Vista", "O endereço que você tentou acessar não está disponível.", "/404"); useNoindex(); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>404</Eyebrow><h1>Essa página saiu da planta.</h1><p>O endereço que você tentou acessar não está disponível.</p><Link href="/" className="button button-dark">Voltar ao início <ArrowUpRight size={16} /></Link></div></section></Layout>; }
 
-export default function App() { return <Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch>; }
+declare global {
+  interface Window { gtag?: (...args: unknown[]) => void }
+}
+
+// GA4 é configurado com send_page_view: false no index.html; numa SPA o page_view é disparado aqui a cada troca de rota.
+function GaPageViewTracker() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.gtag?.("event", "page_view", { page_path: location, page_location: window.location.href, page_title: document.title });
+  }, [location]);
+  return null;
+}
+
+export default function App() { return <><GaPageViewTracker /><Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch></>; }

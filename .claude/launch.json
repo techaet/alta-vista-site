@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "alta-vista-dist",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["scripts/servir-dist.py", "5173"],
+      "port": 5173
     }
   ]
 }
