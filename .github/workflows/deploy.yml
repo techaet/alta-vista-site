@@ -1,4 +1,4 @@
-name: Deploy (build + FTP)
+name: Deploy (build + rsync para a VPS)
 
 on:
   push:
@@ -30,12 +30,13 @@ jobs:
       - name: Gerar build de produção
         run: pnpm run build
 
-      - name: Enviar dist/public via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./dist/public/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+      - name: Enviar dist/public por rsync para a VPS
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # sem --delete: o servidor só aceita escrita (rrsync -wo -no-del), como o FTP fazia na prática
+          rsync -rlptz --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy -o BatchMode=yes" ./dist/public/ deploy@189.24.7.25:./
