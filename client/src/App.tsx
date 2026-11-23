@@ -159,7 +159,7 @@ function Footer() {
       <div><p className="footer-label">MATERIAIS</p><div className="footer-links"><Link href="/materiais">Baixar materiais</Link><a href={tableFile} download>Tabela comercial PDF</a><a href={plantaFile} download>Planta do apartamento</a></div></div>
       <div><p className="footer-label">ATENDIMENTO</p><div className="footer-contact"><a href={whatsapp} target="_blank" rel="noreferrer">WhatsApp</a><a href="mailto:fzmarau@gmail.com">fzmarau@gmail.com</a><a href="https://www.instagram.com/altavista_fz/" target="_blank" rel="noreferrer"><Instagram size={15} /> Instagram</a></div></div>
     </div>
-    <div className="container footer-bottom"><span className="footer-builder"><img src="/assets/fz-construtora-logo.png" alt="Fioravanso e Zanchet Construtora" className="footer-builder-logo" width="86" height="90" /> Uma construção Fioravanso e Zanchet</span><span>© 2026 Residencial Alta Vista</span><span>CNPJ 32.149.779/0001-79</span><Link href="/privacidade">Política de privacidade</Link></div>
+    <div className="container footer-bottom"><span className="footer-builder"><img src="/assets/fz-construtora-logo.png" alt="Fioravanso e Zanchet Construtora" className="footer-builder-logo" width="86" height="90" /> Uma construção Fioravanso e Zanchet</span><span>© 2026 Residencial Alta Vista</span><span>CNPJ 32.149.799/0001-79</span><Link href="/privacidade">Política de privacidade</Link></div>
   </footer>;
 }
 

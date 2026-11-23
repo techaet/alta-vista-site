@@ -30,7 +30,7 @@ Só `dist/public/` sobe; arquivos da raiz (este, `scripts/`, `.claude/`) nunca v
 
 - WhatsApp: `+55 (48) 99122-3600` → constante `whatsapp` em `App.tsx` (link `wa.me/5548991223600?text=...`). Atendimento: Leonardo S. Fioravanso.
 - E-mail: `fzmarau@gmail.com` · Instagram `@altavista_fz` · Facebook `altavista.marau.rs`
-- Endereço: Rua A, nº 46, Marau/RS · Construtora Fioravanso e Zanchet Ltda. · CNPJ 32.149.779/0001-79
+- Endereço: Rua A, nº 46, Marau/RS · Fioravanso & Zanchet Ltda. · CNPJ 32.149.799/0001-79
 - Apartamento: 76,90 m² privativos (137,87 m² total), 2 dormitórios (1 suíte), 2 banheiros, sacada com churrasqueira, 2 vagas, elevador. Prédio pronto, documentação regular, com moradores. 20 unidades no total.
 - Pagamento: à vista ou 20% de entrada + financiamento bancário.
 - GA4 `G-DDYVYZG0WT` (no `client/index.html`, com `send_page_view: false`; o `GaPageViewTracker` do `App.tsx` dispara o page_view a cada rota) · `fb:pages` `474050969135076`. O build falha se algum dos dois sumir.
