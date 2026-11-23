@@ -13,7 +13,7 @@ SPA em React 19 + Vite + wouter. **Quase todo o site está em um arquivo: `clien
 
 ## Deploy
 
-Push na `main` → `.github/workflows/deploy.yml` → `pnpm install` → `pnpm check` (TypeScript) → `pnpm build` (com verificação) → FTPS de `dist/public/` para a hospedagem (Apache/HostGator). Sem homologação: push na main = no ar em ~1 min.
+Push na `main` → `.github/workflows/deploy.yml` → `pnpm install` → `pnpm check` (TypeScript) → `pnpm build` (com verificação) → rsync por SSH de `dist/public/` para a VPS da AET (Apache no contêiner `aet-sites`, desde 22/11/2026; chave `DEPLOY_SSH_KEY` que só grava e nunca apaga). Sem homologação: push na main = no ar em ~1 min.
 Só `dist/public/` sobe; arquivos da raiz (este, `scripts/`, `.claude/`) nunca vão para o servidor.
 
 ## Como o site é servido (pré-render)
