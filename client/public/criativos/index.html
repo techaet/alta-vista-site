@@ -454,7 +454,15 @@ function montarPainel(d) {
       <small>${e.data ? dataBR(e.data) : "Próximo passo"}</small><b>${e.titulo}</b><p>${e.texto}</p></li>`).join("");
 }
 
-fetch("dados.json", { cache: "no-store" }).then((r) => r.json()).then(montarPainel)
+// dados.json (repositório): etapas, visitas e vendas. dados-ao-vivo.json (gravado pela VPS de hora em hora): números do Meta.
+const ler = (u) => fetch(u, { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+Promise.all([ler("dados.json"), ler("dados-ao-vivo.json")]).then(([base, vivo]) => {
+  if (!base) throw new Error("sem dados");
+  const d = { ...base, ...(vivo || {}) };
+  if (d.campanha.status === "no_ar" && d.campanha.inicio)
+    d.etapas = d.etapas.map((e) => (e.titulo === "Campanha no ar" ? { ...e, feito: true, data: d.campanha.inicio } : e));
+  return d;
+}).then(montarPainel)
   .catch(() => { document.getElementById("status").innerHTML = "<div><b>Não foi possível carregar os números agora.</b><small>Tente recarregar a página.</small></div>"; });
 </script>
 
