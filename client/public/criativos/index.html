@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico">
+<title>Anúncios Alta Vista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: uma coluna estreita como um feed de celular; cada peça é um "post" com vídeo ou carrossel deslizante. */
+:root {
+  color-scheme: dark;
+  --bg: #121110;
+  --surface: #1c1a18;
+  --line: #2e2a26;
+  --fg: #f2eee8;
+  --muted: #a39b91;
+  --gold: #d6b67c;
+  --font: "Manrope", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 480px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 40px; }
+header { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+header img { width: 190px; border-radius: 6px; }
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; font-weight: 800; text-wrap: balance; }
+h1 span { color: var(--gold); }
+.lead { margin: 0; color: var(--muted); max-width: 60ch; }
+.ficha { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.ficha li { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg); }
+.indice { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
+.indice a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
+.indice a:hover, .indice a:focus-visible { color: var(--gold); border-color: var(--gold); outline: none; }
+
+.post { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
+.post-top { display: flex; flex-direction: column; gap: 2px; }
+.rotulo { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.post h2 { font-size: 1.15rem; line-height: 1.3; margin: 0; font-weight: 700; text-wrap: balance; }
+.post p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.midia { position: relative; width: 100%; max-width: 100%; border-radius: 14px; overflow: hidden; background: var(--surface); }
+.reel { aspect-ratio: 9 / 16; }
+.reel video { width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
+
+.carrossel { aspect-ratio: 4 / 5; }
+.trilho { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.trilho::-webkit-scrollbar { display: none; }
+.slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; position: relative; }
+.slide img, .slide video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.contador { position: absolute; top: 12px; right: 12px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(18,17,16,.72); color: #f2eee8; font-variant-numeric: tabular-nums; pointer-events: none; }
+.seta { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(242,238,232,.88); color: #121110; font-size: 18px; font-weight: 800; cursor: pointer; display: grid; place-items: center; opacity: 0; transition: opacity .2s; }
+.seta.ant { left: 10px; } .seta.prox { right: 10px; }
+.carrossel:hover .seta:not([disabled]), .seta:focus-visible { opacity: 1; }
+.seta[disabled] { display: none; }
+.seta:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.som { position: absolute; bottom: 12px; right: 12px; border: 0; border-radius: 999px; padding: 5px 11px; font: 700 12px var(--font); background: rgba(18,17,16,.72); color: #f2eee8; cursor: pointer; }
+.som:focus-visible { outline: 2px solid var(--gold); }
+.pontos { display: flex; justify-content: center; gap: 5px; }
+.pontos i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background .2s; }
+.pontos i.on { background: var(--gold); }
+@media (hover: none) { .seta { display: none; } }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--muted); }
+footer strong { color: var(--fg); font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .trilho { scroll-behavior: auto; } .seta, .pontos i { transition: none; } }
+body { margin: 0; }
+img { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <img src="media/placa.webp" alt="Placa do Residencial Alta Vista">
+    <h1>Anúncios para vender os <span>4 últimos apartamentos</span></h1>
+    <p class="lead">Oito peças para Instagram e Facebook: quatro vídeos para Reels e quatro carrosséis. Nos carrosséis, arraste para o lado para ver os cards, como no Instagram. Toque nos vídeos para ouvir o som.</p>
+    <ul class="ficha">
+      <li>2 dormitórios (1 suíte)</li><li>Sacada com churrasqueira</li><li>Elevador</li><li>2 vagas de garagem</li><li>Entrada a partir de R$ 82 mil</li>
+    </ul>
+    <nav class="indice" aria-label="Peças" id="indice"></nav>
+  </header>
+
+  <main id="feed" style="display:flex;flex-direction:column;gap:44px"></main>
+
+  <footer>
+    <div><strong>Apartamentos:</strong> 502 e 504 no 5º andar (entrada de R$ 82 mil) · 601 e 604 no 6º andar (entrada de R$ 85 mil). Frente (502 e 601) com vista do pôr do sol; fundos (504 e 604) com o nascer do sol e a cidade.</div>
+    <div><strong>Contato nos anúncios:</strong> "Fale direto com a construtora" · WhatsApp (51) 99506-3600.</div>
+    <div>Os vídeos também têm versão 4:5 para o feed. Imagens de interiores decorados: projeto da arquiteta Anaise Breda (crédito na legenda dos anúncios).</div>
+  </footer>
+</div>
+
+<script>
+const PECAS = [
+  { n: 1, tipo: "Vídeo · Reels · 37 s", titulo: "Restam 4", texto: "Os quatro últimos apartamentos prontos e a entrada a partir de R$ 82 mil.", reel: "p1" },
+  { n: 2, tipo: "Carrossel · 8 cards", titulo: "Restam 4: escolha o seu", texto: "A entrada de cada andar e a vista de cada apartamento.", cards: ["1","2","3","4","5","6","7","8"] },
+  { n: 3, tipo: "Carrossel · 7 cards", titulo: "O que R$ 82 mil de entrada compram em Marau?", texto: "Como é viver no apartamento: sala, suíte, o 2º quarto que muda de uso, banheiros e churrasco na sacada.", cards: ["1","2","3","4v","5","6","7"] },
+  { n: 4, tipo: "Vídeo · Reels · 32 s", titulo: "Ser dono", texto: "O que muda quando o apartamento é teu.", reel: "p4" },
+  { n: 5, tipo: "Vídeo · Reels · 28 s", titulo: "Tour até a sacada", texto: "Um passeio pelo apartamento decorado até a sacada com churrasqueira.", reel: "p5" },
+  { n: 6, tipo: "Vídeo · Reels · 18 s", titulo: "Chave na mão", texto: "Apartamento pronto: é só pegar a chave e mudar.", reel: "p6" },
+  { n: 7, tipo: "Carrossel · 7 cards", titulo: "Vista do 6º andar", texto: "601 de frente para o pôr do sol, 604 com o nascer do sol e a cidade. Entrada de R$ 85 mil.", cards: ["1","2","3","4v","5v","6","7"] },
+  { n: 8, tipo: "Carrossel · 7 cards", titulo: "Sem pátio para cuidar", texto: "Para quem quer sair da casa com pátio: elevador, 2 vagas e o fim de semana livre.", cards: ["1","2","3v","4","5","6v","7"] },
+];
+
+const feed = document.getElementById("feed");
+const indice = document.getElementById("indice");
+const el = (tag, attrs = {}, html = "") => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (html) e.innerHTML = html; return e; };
+
+function videoCard(src, poster) {
+  const v = el("video", { src, poster, muted: "", loop: "", playsinline: "", preload: "metadata" });
+  v.muted = true;
+  return v;
+}
+
+for (const p of PECAS) {
+  indice.append(el("a", { href: "#peca-" + p.n }, "Peça " + p.n));
+  const post = el("article", { class: "post", id: "peca-" + p.n });
+  post.append(el("div", { class: "post-top" }, `<span class="rotulo">Peça ${p.n} · ${p.tipo}</span><h2>${p.titulo}</h2><p>${p.texto}</p>`));
+
+  if (p.reel) {
+    const box = el("div", { class: "midia reel" });
+    box.append(el("video", { src: `media/${p.reel}.mp4`, poster: `media/${p.reel}.webp`, controls: "", playsinline: "", preload: "metadata" }));
+    post.append(box);
+  } else {
+    const box = el("div", { class: "midia carrossel", role: "region", "aria-label": `Carrossel da peça ${p.n}` });
+    const trilho = el("div", { class: "trilho", tabindex: "0" });
+    p.cards.forEach((c, i) => {
+      const num = c.replace("v", ""), base = `media/p${p.n}-card${num}`;
+      const s = el("div", { class: "slide" });
+      if (c.endsWith("v")) {
+        s.append(videoCard(base + ".mp4", base + ".webp"));
+        const b = el("button", { class: "som", type: "button" }, "Som: desligado");
+        b.addEventListener("click", () => { const v = s.querySelector("video"); v.muted = !v.muted; b.textContent = v.muted ? "Som: desligado" : "Som: ligado"; v.play().catch(() => {}); });
+        s.append(b);
+      } else {
+        s.append(el("img", { src: base + ".webp", alt: `Peça ${p.n}, card ${i + 1}`, loading: i ? "lazy" : "eager", decoding: "async" }));
+      }
+      trilho.append(s);
+    });
+    const cont = el("span", { class: "contador" }, `1/${p.cards.length}`);
+    const ant = el("button", { class: "seta ant", type: "button", "aria-label": "Card anterior" }, "‹");
+    const prox = el("button", { class: "seta prox", type: "button", "aria-label": "Próximo card" }, "›");
+    box.append(trilho, cont, ant, prox);
+    const pontos = el("div", { class: "pontos", "aria-hidden": "true" });
+    p.cards.forEach(() => pontos.append(el("i")));
+    post.append(box, pontos);
+
+    const atual = () => Math.round(trilho.scrollLeft / trilho.clientWidth);
+    const ir = (i) => trilho.scrollTo({ left: i * trilho.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    const marcar = () => {
+      const i = atual();
+      cont.textContent = `${i + 1}/${p.cards.length}`;
+      [...pontos.children].forEach((d, k) => d.classList.toggle("on", k === i));
+      ant.disabled = i === 0; prox.disabled = i === p.cards.length - 1;
+      [...trilho.children].forEach((s, k) => { const v = s.querySelector("video"); if (!v) return; if (k === i && visivel.has(box)) v.play().catch(() => {}); else v.pause(); });
+    };
+    box._marcar = marcar;
+    trilho.addEventListener("scroll", () => { clearTimeout(trilho._t); trilho._t = setTimeout(marcar, 60); }, { passive: true });
+    trilho.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); ir(atual() + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); ir(atual() - 1); } });
+    ant.addEventListener("click", () => ir(atual() - 1));
+    prox.addEventListener("click", () => ir(atual() + 1));
+    requestAnimationFrame(marcar);
+  }
+  feed.append(post);
+}
+
+// Vídeos dos carrosséis só tocam (sem som) quando o carrossel está na tela; o Reels pausa ao sair da tela.
+const visivel = new Set();
+const obs = new IntersectionObserver((entradas) => {
+  for (const en of entradas) {
+    const box = en.target;
+    if (en.isIntersecting) visivel.add(box); else visivel.delete(box);
+    if (box._marcar) box._marcar();
+    else if (!en.isIntersecting) box.querySelector("video")?.pause();
+  }
+}, { threshold: 0.6 });
+document.querySelectorAll(".midia").forEach((m) => obs.observe(m));
+</script>
+
+</body>
+</html>
