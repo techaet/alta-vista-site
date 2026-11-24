@@ -20,6 +20,7 @@ const warnings = [];
 const template = fs.readFileSync(path.join(out, "index.html"), "utf8");
 if (!template.includes("G-DDYVYZG0WT")) errors.push("index.html sem a tag do GA4 (G-DDYVYZG0WT)");
 if (!template.includes('property="fb:pages"')) errors.push('index.html sem <meta property="fb:pages">');
+if (!template.includes("989168169377888")) errors.push("index.html sem o Meta Pixel (989168169377888)");
 
 const slugs = new Set();
 const textOf = html => html.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ");

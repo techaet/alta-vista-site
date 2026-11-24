@@ -11,6 +11,15 @@
       gtag('js', new Date());
       gtag('config', 'G-DDYVYZG0WT', { send_page_view: false }); // page_view disparado no App.tsx a cada troca de rota (SPA)
     </script>
+    <!-- Meta Pixel "Alta Vista Pixel" — não remover: o build falha sem ele (scripts/prerender.mjs). PageView e Contact saem do App.tsx -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '989168169377888');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#252624" />
     <meta name="description" content="Residencial Alta Vista: apartamentos prontos em Marau/RS, com 76,90 m² privativos, suíte, sacada com churrasqueira e duas vagas." />

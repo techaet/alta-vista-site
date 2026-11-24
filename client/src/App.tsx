@@ -271,20 +271,30 @@ function ArticleView({ article }: { article: Article }) {
 }
 
 function ContactPage() { useDocumentMeta("Contato | Residencial Alta Vista", "Fale com a Construtora Fioravanso e Zanchet pelo WhatsApp, telefone ou e-mail e agende uma visita ao Residencial Alta Vista em Marau/RS.", "/contato"); return <Layout><PageHero kind="contato" eyebrow="CONTATO" title="Vamos conversar sobre o seu próximo endereço." copy="Leonardo S. Fioravanso atende pelo WhatsApp, e-mail e redes sociais da construtora." image={interior} /><section className="section-pad contact-page"><div className="container contact-detail"><div><Eyebrow>ATENDIMENTO COMERCIAL</Eyebrow><h2>Uma conversa objetiva para encontrar a unidade certa.</h2><p>Agende uma visita, tire dúvidas sobre a planta ou consulte as condições de pagamento diretamente com a construtora.</p><WhatsAppButton className="button button-dark">Chamar no WhatsApp <MessageCircle size={17} /></WhatsAppButton></div><div className="contact-card"><span className="contact-avatar">LF</span><strong>Leonardo S. Fioravanso</strong><small>Gerente comercial</small><a href="tel:+5548991223600">+55 (48) 99122-3600</a><a href="mailto:fzmarau@gmail.com">fzmarau@gmail.com</a><a href="https://www.instagram.com/altavista_fz/" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={15} /></a><a href="https://www.facebook.com/altavista.marau.rs" target="_blank" rel="noreferrer">Facebook <ArrowUpRight size={15} /></a></div></div></section></Layout>; }
-function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial Alta Vista", "Como a Construtora Fioravanso e Zanchet trata os dados de contato dos visitantes do site do Residencial Alta Vista.", "/privacidade"); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>TRANSPARÊNCIA</Eyebrow><h1>Política de privacidade</h1><p>Este site utiliza links de contato para facilitar o atendimento da Construtora Fioravanso e Zanchet Ltda. Ao iniciar uma conversa por WhatsApp, e-mail ou rede social, os dados passam a ser tratados pela respectiva plataforma e pela construtora para fins de atendimento comercial.</p><p>O site não possui formulário próprio nem área autenticada. Para dúvidas sobre o uso de dados, entre em contato pelo e-mail fzmarau@gmail.com.</p></div></section></Layout>; }
+function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial Alta Vista", "Como a Construtora Fioravanso e Zanchet trata os dados de contato dos visitantes do site do Residencial Alta Vista.", "/privacidade"); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>TRANSPARÊNCIA</Eyebrow><h1>Política de privacidade</h1><p>Este site utiliza links de contato para facilitar o atendimento da Construtora Fioravanso e Zanchet Ltda. Ao iniciar uma conversa por WhatsApp, e-mail ou rede social, os dados passam a ser tratados pela respectiva plataforma e pela construtora para fins de atendimento comercial.</p><p>O site não possui formulário próprio nem área autenticada. Para medir as visitas e mostrar anúncios do Residencial Alta Vista, usamos o Google Analytics e o pixel da Meta (Facebook e Instagram), que registram dados de navegação de forma anônima por meio de cookies. Para dúvidas sobre o uso de dados, entre em contato pelo e-mail fzmarau@gmail.com.</p></div></section></Layout>; }
 function PageHero({ kind = "default", eyebrow, title, copy, image }: { kind?: string; eyebrow: string; title: string; copy: string; image: string }) { return <section className={`page-hero page-hero-${kind}`}><img className="page-hero-image" src={image} alt="" fetchPriority="high" decoding="async" /><div className="page-hero-overlay" /><div className="page-hero-rule" /><div className="container page-hero-content"><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1><p>{copy}</p></div></section>; }
 function NotFound() { useDocumentMeta("Página não encontrada | Residencial Alta Vista", "O endereço que você tentou acessar não está disponível.", "/404"); useNoindex(); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>404</Eyebrow><h1>Essa página saiu da planta.</h1><p>O endereço que você tentou acessar não está disponível.</p><Link href="/" className="button button-dark">Voltar ao início <ArrowUpRight size={16} /></Link></div></section></Layout>; }
 
 declare global {
-  interface Window { gtag?: (...args: unknown[]) => void }
+  interface Window { gtag?: (...args: unknown[]) => void; fbq?: (...args: unknown[]) => void }
 }
 
 // GA4 é configurado com send_page_view: false no index.html; numa SPA o page_view é disparado aqui a cada troca de rota.
+// O Meta Pixel (init no index.html) recebe o PageView no mesmo ponto e um Contact a cada clique num link do WhatsApp.
 function GaPageViewTracker() {
   const [location] = useLocation();
   useEffect(() => {
     window.gtag?.("event", "page_view", { page_path: location, page_location: window.location.href, page_title: document.title });
+    window.fbq?.("track", "PageView");
   }, [location]);
+  useEffect(() => {
+    const aoClicar = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement | null)?.closest?.("a[href*='wa.me']");
+      if (link) window.fbq?.("track", "Contact");
+    };
+    document.addEventListener("click", aoClicar);
+    return () => document.removeEventListener("click", aoClicar);
+  }, []);
   return null;
 }
 
