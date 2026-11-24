@@ -1,0 +1,31 @@
+{
+  "atualizado": "2026-11-24T16:30:00-03:00",
+  "campanha": {
+    "status": "rascunho",
+    "inicio": null,
+    "orcamento_dia": 30,
+    "raio_km": 60
+  },
+  "totais": { "investido": 0, "alcance": 0, "impressoes": 0, "cliques": 0, "leads": 0 },
+  "dias": [],
+  "anuncios": [
+    { "id": "p1", "leads": 0, "investido": 0, "alcance": 0, "cliques": 0 },
+    { "id": "p3", "leads": 0, "investido": 0, "alcance": 0, "cliques": 0 },
+    { "id": "p6", "leads": 0, "investido": 0, "alcance": 0, "cliques": 0 }
+  ],
+  "respostas": {
+    "andar": { "5º andar": 0, "6º andar": 0, "Tanto faz": 0 },
+    "quando": { "Esta semana": 0, "Este mês": 0, "Só pesquisando": 0 },
+    "pagar": { "Financiamento": 0, "À vista": 0, "Ainda não sei": 0 }
+  },
+  "andamento": { "visitas": 0, "vendas": 0 },
+  "etapas": [
+    { "data": "2026-11-22", "titulo": "8 peças criadas", "texto": "4 vídeos e 4 carrosséis com os apartamentos prontos.", "feito": true },
+    { "data": "2026-11-24", "titulo": "Revisão crítica", "texto": "Cada peça passou por um teste de “prende nos 3 primeiros segundos?” e de foco em vender.", "feito": true },
+    { "data": "2026-11-24", "titulo": "Oferta na primeira imagem", "texto": "“R$ 100 mil abaixo da tabela”: de R$ 510 mil por R$ 410 mil no 5º andar.", "feito": true },
+    { "data": "2026-11-24", "titulo": "Fotos de dia de sol", "texto": "Prédio centralizado, céu azul e luz clara em todas as imagens.", "feito": true },
+    { "data": "2026-11-24", "titulo": "Peças aprovadas", "texto": "Versões finais e textos dos anúncios aprovados.", "feito": true },
+    { "data": "2026-11-24", "titulo": "Formulário e planilha", "texto": "Quem se interessa deixa nome e telefone; o contato cai numa planilha e a pessoa segue para o WhatsApp da construtora.", "feito": true },
+    { "data": null, "titulo": "Campanha no ar", "texto": "R$ 30 por dia, Facebook e Instagram, Marau e até 60 km.", "feito": false }
+  ]
+}

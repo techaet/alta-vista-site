@@ -9,41 +9,122 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: uma coluna estreita como um feed de celular; cada peça é um "post" com vídeo ou carrossel deslizante. */
+/* Página para os donos da construtora: painel da campanha (números em dados.json, atualizado 1x por dia),
+   os anúncios no ar, as 8 peças e o caminho até aqui. Uma coluna estreita, como um feed de celular. */
 :root {
   color-scheme: dark;
   --bg: #121110;
   --surface: #1c1a18;
+  --surface2: #24211e;
   --line: #2e2a26;
   --fg: #f2eee8;
   --muted: #a39b91;
   --gold: #d6b67c;
+  --green: #4cc38a;
+  --amber: #e8b04a;
   --font: "Manrope", "Helvetica Neue", Arial, sans-serif;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 480px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 40px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; }
+.wrap { max-width: 520px; margin: 0 auto; padding-block: 24px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 44px; }
 header { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
-header img { width: 190px; border-radius: 6px; }
+header img { width: 170px; border-radius: 6px; }
 h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; font-weight: 800; text-wrap: balance; }
-h1 span { color: var(--gold); }
-.lead { margin: 0; color: var(--muted); max-width: 60ch; }
-.ficha { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
-.ficha li { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg); }
-.indice { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
-.indice a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
-.indice a:hover, .indice a:focus-visible { color: var(--gold); border-color: var(--gold); outline: none; }
+h1 span, .ouro { color: var(--gold); }
+.lead { margin: 0; color: var(--muted); }
+nav.abas { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; overflow-x: auto; padding: 10px 0; margin: -10px 0; background: var(--bg); scrollbar-width: none; }
+nav.abas::-webkit-scrollbar { display: none; }
+nav.abas a { flex: 0 0 auto; font-size: 13px; font-weight: 700; color: var(--fg); text-decoration: none; padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; }
+nav.abas a:hover, nav.abas a:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
 
-.post { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
-.post-top { display: flex; flex-direction: column; gap: 2px; }
+section { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 60px; }
+.secao-top { display: flex; flex-direction: column; gap: 4px; }
 .rotulo { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
-.post h2 { font-size: 1.15rem; line-height: 1.3; margin: 0; font-weight: 700; text-wrap: balance; }
-.post p { margin: 0; color: var(--muted); font-size: 14px; }
+h2 { font-size: 1.3rem; line-height: 1.25; margin: 0; font-weight: 800; text-wrap: balance; }
+h3 { font-size: 1rem; margin: 0; font-weight: 700; }
+.nota { margin: 0; color: var(--muted); font-size: 13.5px; }
+.cartao { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-.midia { position: relative; width: 100%; max-width: 100%; border-radius: 14px; overflow: hidden; background: var(--surface); }
+/* status */
+.status { display: flex; align-items: center; gap: 12px; }
+.status .ponto { width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto; background: var(--amber); box-shadow: 0 0 0 5px rgba(232,176,74,.18); }
+.status.no_ar .ponto { background: var(--green); box-shadow: 0 0 0 5px rgba(76,195,138,.2); animation: pulsa 2s infinite; }
+.status.pausada .ponto { background: var(--muted); box-shadow: none; }
+.status b { font-size: 1.05rem; }
+.status small { display: block; color: var(--muted); font-size: 13px; }
+@keyframes pulsa { 50% { box-shadow: 0 0 0 9px rgba(76,195,138,0); } }
+
+/* números grandes */
+.numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.num { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.num .ico { font-size: 20px; line-height: 1; }
+.num strong { font-size: 1.7rem; font-weight: 800; letter-spacing: -.5px; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.num span { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.num.destaque { border-color: rgba(214,182,124,.55); background: linear-gradient(160deg, #2a241b, var(--surface)); }
+.num.destaque strong { color: var(--gold); }
+
+/* funil */
+.funil { display: flex; flex-direction: column; gap: 8px; }
+.degrau { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; }
+.degrau .nome { font-size: 13.5px; font-weight: 600; }
+.degrau .valor { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.barra { grid-column: 1 / -1; height: 12px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+.barra i { display: block; height: 100%; border-radius: 999px; background: var(--gold); transition: width .6s ease; }
+.barra.verde i { background: var(--green); }
+
+/* gráfico por dia */
+.dias { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding-top: 18px; border-bottom: 1px solid var(--line); }
+.dia { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 3px; min-width: 0; }
+.dia i { width: 100%; max-width: 26px; border-radius: 5px 5px 0 0; background: var(--gold); min-height: 2px; }
+.dia b { font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.eixo { display: flex; gap: 4px; }
+.eixo span { flex: 1; text-align: center; font-size: 10px; color: var(--muted); min-width: 0; }
+.vazio { text-align: center; color: var(--muted); font-size: 13.5px; padding: 18px 8px; border: 1px dashed var(--line); border-radius: 12px; }
+
+/* ranking de anúncios */
+.rank { display: flex; flex-direction: column; gap: 10px; }
+.rank-item { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: center; }
+.rank-item img { width: 52px; height: 65px; object-fit: cover; border-radius: 8px; }
+.rank-item .info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rank-item .linha { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.rank-item .linha b { white-space: nowrap; }
+
+/* respostas */
+.respostas { display: flex; flex-direction: column; gap: 16px; }
+.resp h3 { font-size: 14px; margin-bottom: 6px; }
+
+/* anúncios no ar */
+.quem { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; }
+.alvo { width: 96px; height: 96px; }
+.fatos { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.fatos div { display: flex; gap: 8px; }
+.anuncio { display: flex; flex-direction: column; gap: 10px; }
+.ig { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.ig-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; font-weight: 700; }
+.ig-top img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #fff; }
+.ig-top small { display: block; font-weight: 500; color: var(--muted); font-size: 11px; }
+.ig .quadro { aspect-ratio: 4 / 5; background: #000; }
+.ig .quadro video, .ig .quadro img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ig-cta { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); font-size: 13.5px; font-weight: 700; }
+.ig-cta .bt { padding: 6px 12px; border-radius: 8px; background: #3a3530; font-size: 12.5px; white-space: nowrap; }
+.ig-texto { padding: 10px 12px 14px; font-size: 13.5px; color: var(--fg); }
+.ig-texto b { margin-right: 4px; }
+.passos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.passo { background: var(--surface2); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.passo .n { width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: #121110; font-weight: 800; display: grid; place-items: center; font-size: 13px; }
+.passo b { font-size: 13.5px; }
+.passo span { color: var(--muted); }
+
+/* biblioteca */
+.post { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 60px; }
+.post-top { display: flex; flex-direction: column; gap: 2px; }
+.post h3 { font-size: 1.1rem; text-wrap: balance; }
+.post p { margin: 0; color: var(--muted); font-size: 14px; }
+.selo { align-self: flex-start; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: rgba(76,195,138,.16); color: var(--green); }
+.midia { position: relative; width: 100%; border-radius: 14px; overflow: hidden; background: var(--surface); }
 .reel { aspect-ratio: 9 / 16; }
 .reel video { width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
-
 .carrossel { aspect-ratio: 4 / 5; }
 .trilho { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .trilho::-webkit-scrollbar { display: none; }
@@ -56,17 +137,25 @@ h1 span { color: var(--gold); }
 .seta[disabled] { display: none; }
 .seta:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .som { position: absolute; bottom: 12px; right: 12px; border: 0; border-radius: 999px; padding: 5px 11px; font: 700 12px var(--font); background: rgba(18,17,16,.72); color: #f2eee8; cursor: pointer; }
-.som:focus-visible { outline: 2px solid var(--gold); }
 .pontos { display: flex; justify-content: center; gap: 5px; }
 .pontos i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background .2s; }
 .pontos i.on { background: var(--gold); }
 @media (hover: none) { .seta { display: none; } }
 
+/* linha do tempo */
+.tempo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tempo li { position: relative; padding: 0 0 18px 30px; }
+.tempo li::before { content: ""; position: absolute; left: 8px; top: 18px; bottom: 0; width: 2px; background: var(--line); }
+.tempo li:last-child::before { display: none; }
+.tempo .marca { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--green); display: grid; place-items: center; color: #121110; font-size: 11px; font-weight: 900; }
+.tempo li.aberta .marca { background: var(--surface2); border: 2px solid var(--amber); }
+.tempo b { display: block; font-size: 14.5px; }
+.tempo small { color: var(--gold); font-size: 12px; font-weight: 700; }
+.tempo p { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+
 footer { border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--muted); }
-footer strong { color: var(--fg); font-weight: 700; }
-@media (prefers-reduced-motion: reduce) { .trilho { scroll-behavior: auto; } .seta, .pontos i { transition: none; } }
-body { margin: 0; }
-img { max-width: 100%; }
+footer strong { color: var(--fg); }
+@media (prefers-reduced-motion: reduce) { .status.no_ar .ponto { animation: none; } .barra i { transition: none; } }
 </style>
 </head>
 <body>
@@ -74,50 +163,174 @@ img { max-width: 100%; }
 <div class="wrap">
   <header>
     <img src="media/placa.webp" alt="Placa do Residencial Alta Vista">
-    <h1>Anúncios para vender os <span>4 últimos apartamentos</span></h1>
-    <p class="lead">Oito peças para Instagram e Facebook: quatro vídeos para Reels e quatro carrosséis. Nos carrosséis, arraste para o lado para ver os cards, como no Instagram. Toque nos vídeos para ouvir o som.</p>
-    <ul class="ficha">
-      <li>2 dormitórios (1 suíte)</li><li>Sacada com churrasqueira</li><li>Elevador</li><li>2 vagas de garagem</li><li>Entrada a partir de R$ 82 mil</li>
-    </ul>
-    <nav class="indice" aria-label="Peças" id="indice"></nav>
+    <h1>Campanha dos <span>4 últimos apartamentos</span></h1>
+    <p class="lead">Acompanhe aqui os anúncios do Alta Vista no Facebook e no Instagram: quantas pessoas viram, quantas pediram para visitar e quanto custou cada interessado.</p>
   </header>
 
-  <main id="feed" style="display:flex;flex-direction:column;gap:44px"></main>
+  <nav class="abas" aria-label="Seções">
+    <a href="#painel">Painel</a><a href="#anuncios">Anúncios no ar</a><a href="#pecas">As 8 peças</a><a href="#caminho">Como chegamos aqui</a>
+  </nav>
+
+  <!-- PAINEL -->
+  <section id="painel">
+    <div class="secao-top">
+      <span class="rotulo">Painel</span>
+      <h2>Como está a campanha</h2>
+      <p class="nota" id="atualizado"></p>
+    </div>
+
+    <div class="cartao"><div class="status" id="status"></div></div>
+
+    <div class="numeros">
+      <div class="num"><span class="ico" aria-hidden="true">👀</span><strong id="n-alcance">0</strong><span>pessoas viram o anúncio</span></div>
+      <div class="num destaque"><span class="ico" aria-hidden="true">🙋</span><strong id="n-leads">0</strong><span>pediram para visitar (deixaram nome e telefone)</span></div>
+      <div class="num"><span class="ico" aria-hidden="true">🏷️</span><strong id="n-custo">–</strong><span>custo de cada interessado</span></div>
+      <div class="num"><span class="ico" aria-hidden="true">💰</span><strong id="n-investido">R$ 0</strong><span id="n-investido-sub">investidos até agora</span></div>
+    </div>
+
+    <div class="cartao">
+      <h3>Do anúncio até a venda</h3>
+      <p class="nota">Cada barra mostra quantas pessoas chegaram àquela etapa.</p>
+      <div class="funil" id="funil"></div>
+    </div>
+
+    <div class="cartao">
+      <h3>Interessados por dia</h3>
+      <div id="grafico-dias"></div>
+    </div>
+
+    <div class="cartao">
+      <h3>Qual anúncio traz mais interessados</h3>
+      <div class="rank" id="rank"></div>
+    </div>
+
+    <div class="cartao">
+      <h3>O que os interessados responderam</h3>
+      <div class="respostas" id="respostas"></div>
+    </div>
+  </section>
+
+  <!-- ANÚNCIOS NO AR -->
+  <section id="anuncios">
+    <div class="secao-top">
+      <span class="rotulo">Anúncios no ar</span>
+      <h2>Os 3 anúncios da primeira rodada</h2>
+      <p class="nota">É assim que eles aparecem no celular. As outras peças entram nas próximas rodadas, trocando as que trouxerem menos interessados.</p>
+    </div>
+
+    <div class="cartao">
+      <h3>Quem vê os anúncios</h3>
+      <div class="quem">
+        <svg class="alvo" viewBox="0 0 96 96" aria-hidden="true">
+          <circle cx="48" cy="48" r="44" fill="rgba(214,182,124,.08)" stroke="#d6b67c" stroke-dasharray="4 4"/>
+          <circle cx="48" cy="48" r="26" fill="rgba(214,182,124,.12)" stroke="rgba(214,182,124,.5)"/>
+          <circle cx="48" cy="48" r="6" fill="#d6b67c"/>
+          <text x="48" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#d6b67c" font-family="Manrope, sans-serif">60 km</text>
+          <text x="48" y="66" text-anchor="middle" font-size="9" font-weight="700" fill="#f2eee8" font-family="Manrope, sans-serif">Marau</text>
+        </svg>
+        <div class="fatos">
+          <div><span aria-hidden="true">📍</span><span>Marau e cidades em volta, até <b>60 km</b> (Passo Fundo entra)</span></div>
+          <div><span aria-hidden="true">👥</span><span>Adultos de <b>18 a 65 anos</b></span></div>
+          <div><span aria-hidden="true">📱</span><span>Facebook e Instagram: feed, stories e reels</span></div>
+          <div><span aria-hidden="true">💵</span><span><b>R$&nbsp;30 por dia</b> (cerca de R$&nbsp;900 por mês)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <h3>O que acontece quando a pessoa toca no anúncio</h3>
+      <div class="passos">
+        <div class="passo"><span class="n">1</span><b>Abre um formulário</b><span>Sem sair do Instagram ou do Facebook. Nome e telefone já vêm preenchidos.</span></div>
+        <div class="passo"><span class="n">2</span><b>Responde 3 perguntas</b><span>Qual andar, quando quer visitar e como pretende pagar.</span></div>
+        <div class="passo"><span class="n">3</span><b>Contato salvo</b><span>O interessado cai numa planilha da construtora. Ninguém se perde.</span></div>
+        <div class="passo"><span class="n">4</span><b>Vai para o WhatsApp</b><span>Botão “Agendar visita no WhatsApp”, direto no (51) 99506-3600.</span></div>
+      </div>
+    </div>
+
+    <div id="lista-anuncios" style="display:flex;flex-direction:column;gap:28px"></div>
+  </section>
+
+  <!-- AS 8 PEÇAS -->
+  <section id="pecas">
+    <div class="secao-top">
+      <span class="rotulo">As 8 peças</span>
+      <h2>Todo o material pronto</h2>
+      <p class="nota">Quatro vídeos e quatro carrosséis, todos com a oferta logo na primeira imagem. Nos carrosséis, arraste para o lado. Toque nos vídeos para ouvir.</p>
+    </div>
+    <div id="feed" style="display:flex;flex-direction:column;gap:44px"></div>
+  </section>
+
+  <!-- CAMINHO -->
+  <section id="caminho">
+    <div class="secao-top">
+      <span class="rotulo">Como chegamos aqui</span>
+      <h2>Etapas da campanha</h2>
+    </div>
+    <ol class="tempo" id="tempo"></ol>
+  </section>
 
   <footer>
-    <div><strong>Apartamentos:</strong> 502 e 504 no 5º andar (entrada de R$ 82 mil) · 601 e 604 no 6º andar (entrada de R$ 85 mil). Frente (502 e 601) com vista do pôr do sol; fundos (504 e 604) com o nascer do sol e a cidade.</div>
-    <div><strong>Contato nos anúncios:</strong> "Fale direto com a construtora" · WhatsApp (51) 99506-3600.</div>
-    <div>Os vídeos também têm versão 4:5 para o feed. Imagens de interiores decorados: projeto da arquiteta Anaise Breda (crédito na legenda dos anúncios).</div>
+    <div><strong>Oferta:</strong> 5º andar de R$ 510 mil por R$ 410 mil (entrada de R$ 82 mil) · 6º andar de R$ 515 mil por R$ 425 mil (entrada de R$ 85 mil). Valores de tabela de set/2026: R$ 513.299 e R$ 519.508.</div>
+    <div><strong>Apartamentos:</strong> 502 e 504 no 5º andar · 601 e 604 no 6º andar. 2 dormitórios (1 suíte), sacada com churrasqueira, elevador e 2 vagas.</div>
+    <div><strong>Painel:</strong> os números são atualizados uma vez por dia. Visitas e vendas contam quando a construtora marca o interessado na planilha.</div>
+    <div>Imagens de interiores decorados: projeto da arquiteta Anaise Breda.</div>
   </footer>
 </div>
 
 <script>
+const ANUNCIOS = [
+  { id: "p1", nome: "Restam 4", midia: "ad-p1", video: true, thumb: "media/ad-p1.webp",
+    titulo: "Restam 4: R$ 100 mil abaixo da tabela",
+    texto: "Restam 4 apartamentos prontos no Alta Vista, em Marau: 5º andar de R$ 510 mil por R$ 410 mil. Suíte, sacada com churrasqueira, elevador e 2 vagas. Toca no botão, agenda a visita e fale direto com a construtora." },
+  { id: "p3", nome: "R$ 82 mil de entrada", midia: "p3-card1", video: false, thumb: "media/p3-card1.webp",
+    titulo: "R$ 82 mil de entrada",
+    texto: "O que R$ 82 mil de entrada compram em Marau? Um apartamento pronto no Alta Vista, de R$ 510 mil por R$ 410 mil: suíte, 2 banheiros, sacada com churrasqueira e 2 vagas. Restam 4. Toca no botão e agenda a visita." },
+  { id: "p6", nome: "Pronto para morar", midia: "ad-p6", video: true, thumb: "media/ad-p6.webp",
+    titulo: "Pronto para morar: R$ 410 mil no 5º",
+    texto: "O Alta Vista já está pronto: tu visita e vê o apartamento de verdade. 5º andar de R$ 510 mil por R$ 410 mil. Escolhe o andar, assina e é só trazer a mudança. Restam 4. Toca no botão e agenda a visita. Interiores: projeto da arquiteta Anaise Breda." },
+];
+
 const PECAS = [
-  { n: 1, tipo: "Vídeo · Reels · 37 s", titulo: "Restam 4", texto: "Os quatro últimos apartamentos prontos e a entrada a partir de R$ 82 mil.", reel: "p1" },
-  { n: 2, tipo: "Carrossel · 8 cards", titulo: "Restam 4: escolha o seu", texto: "A entrada de cada andar e a vista de cada apartamento.", cards: ["1","2","3","4","5","6","7","8"] },
-  { n: 3, tipo: "Carrossel · 7 cards", titulo: "O que R$ 82 mil de entrada compram em Marau?", texto: "Como é viver no apartamento: sala, suíte, o 2º quarto que muda de uso, banheiros e churrasco na sacada.", cards: ["1","2","3","4v","5","6","7"] },
-  { n: 4, tipo: "Vídeo · Reels · 32 s", titulo: "Ser dono", texto: "O que muda quando o apartamento é teu.", reel: "p4" },
-  { n: 5, tipo: "Vídeo · Reels · 28 s", titulo: "Tour até a sacada", texto: "Um passeio pelo apartamento decorado até a sacada com churrasqueira.", reel: "p5" },
-  { n: 6, tipo: "Vídeo · Reels · 18 s", titulo: "Chave na mão", texto: "Apartamento pronto: é só pegar a chave e mudar.", reel: "p6" },
-  { n: 7, tipo: "Carrossel · 7 cards", titulo: "Vista do 6º andar", texto: "601 de frente para o pôr do sol, 604 com o nascer do sol e a cidade. Entrada de R$ 85 mil.", cards: ["1","2","3","4v","5v","6","7"] },
+  { n: 1, tipo: "Vídeo · 23 s", titulo: "Restam 4", texto: "Os quatro últimos apartamentos prontos, R$ 100 mil abaixo da tabela.", reel: "p1", noar: true },
+  { n: 2, tipo: "Carrossel · 8 cards", titulo: "Restam 4: escolha o seu", texto: "A oferta de cada andar e a vista de cada apartamento.", cards: ["1","2","3","4","5","6","7","8"] },
+  { n: 3, tipo: "Carrossel · 7 cards", titulo: "O que R$ 82 mil de entrada compram em Marau?", texto: "Sala, suíte, o 2º quarto que muda de uso, banheiros e churrasco na sacada.", cards: ["1","2","3","4v","5","6","7"], noar: true },
+  { n: 4, tipo: "Vídeo · 20 s", titulo: "R$ 82 mil de entrada e é teu", texto: "O que muda quando o apartamento é teu.", reel: "p4" },
+  { n: 5, tipo: "Vídeo · 19 s", titulo: "Olha por dentro", texto: "Um passeio pelo apartamento decorado até a sacada com churrasqueira.", reel: "p5" },
+  { n: 6, tipo: "Vídeo · 15 s", titulo: "Pronto para morar", texto: "Apartamento pronto: é só pegar a chave e mudar.", reel: "p6", noar: true },
+  { n: 7, tipo: "Carrossel · 7 cards", titulo: "Vista do 6º andar", texto: "601 de frente para o pôr do sol, 604 com o nascer do sol e a cidade.", cards: ["1","2","3","4v","5v","6","7"] },
   { n: 8, tipo: "Carrossel · 7 cards", titulo: "Sem pátio para cuidar", texto: "Para quem quer sair da casa com pátio: elevador, 2 vagas e o fim de semana livre.", cards: ["1","2","3v","4","5","6v","7"] },
 ];
 
-const feed = document.getElementById("feed");
-const indice = document.getElementById("indice");
 const el = (tag, attrs = {}, html = "") => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (html) e.innerHTML = html; return e; };
+const fmtN = (v) => Math.round(v).toLocaleString("pt-BR");
+const fmtR = (v) => "R$ " + v.toLocaleString("pt-BR", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+const dataBR = (iso) => { const [a, m, d] = iso.slice(0, 10).split("-"); return `${d}/${m}`; };
 
-function videoCard(src, poster) {
-  const v = el("video", { src, poster, muted: "", loop: "", playsinline: "", preload: "metadata" });
-  v.muted = true;
-  return v;
+// ---------- anúncios no ar ----------
+const lista = document.getElementById("lista-anuncios");
+for (const a of ANUNCIOS) {
+  const box = el("article", { class: "anuncio" });
+  const quadro = a.video
+    ? `<video src="media/${a.midia}.mp4" poster="media/${a.midia}.webp" controls playsinline preload="metadata"></video>`
+    : `<img src="media/${a.midia}.webp" alt="Anúncio ${a.nome}" loading="lazy">`;
+  box.innerHTML = `
+    <span class="rotulo">Anúncio · ${a.nome}</span>
+    <div class="ig">
+      <div class="ig-top"><img src="media/placa.webp" alt=""><div>Res. Alta Vista - Marau/RS<small>Patrocinado</small></div></div>
+      <div class="quadro">${quadro}</div>
+      <div class="ig-cta"><span>${a.titulo}</span><span class="bt">Entrar em contato</span></div>
+      <div class="ig-texto"><b>altavistamarau</b>${a.texto}</div>
+    </div>`;
+  lista.append(box);
 }
 
+// ---------- as 8 peças ----------
+const feed = document.getElementById("feed");
+const visivel = new Set();
 for (const p of PECAS) {
-  indice.append(el("a", { href: "#peca-" + p.n }, "Peça " + p.n));
   const post = el("article", { class: "post", id: "peca-" + p.n });
-  post.append(el("div", { class: "post-top" }, `<span class="rotulo">Peça ${p.n} · ${p.tipo}</span><h2>${p.titulo}</h2><p>${p.texto}</p>`));
-
+  post.append(el("div", { class: "post-top" }, `<span class="rotulo">Peça ${p.n} · ${p.tipo}</span><h3>${p.titulo}</h3><p>${p.texto}</p>`));
+  if (p.noar) post.append(el("span", { class: "selo" }, "Na primeira rodada"));
   if (p.reel) {
     const box = el("div", { class: "midia reel" });
     box.append(el("video", { src: `media/${p.reel}.mp4`, poster: `media/${p.reel}.webp`, controls: "", playsinline: "", preload: "metadata" }));
@@ -126,15 +339,15 @@ for (const p of PECAS) {
     const box = el("div", { class: "midia carrossel", role: "region", "aria-label": `Carrossel da peça ${p.n}` });
     const trilho = el("div", { class: "trilho", tabindex: "0" });
     p.cards.forEach((c, i) => {
-      const num = c.replace("v", ""), base = `media/p${p.n}-card${num}`;
+      const base = `media/p${p.n}-card${c.replace("v", "")}`;
       const s = el("div", { class: "slide" });
       if (c.endsWith("v")) {
-        s.append(videoCard(base + ".mp4", base + ".webp"));
+        const v = el("video", { src: base + ".mp4", poster: base + ".webp", loop: "", playsinline: "", preload: "metadata" }); v.muted = true; s.append(v);
         const b = el("button", { class: "som", type: "button" }, "Som: desligado");
-        b.addEventListener("click", () => { const v = s.querySelector("video"); v.muted = !v.muted; b.textContent = v.muted ? "Som: desligado" : "Som: ligado"; v.play().catch(() => {}); });
+        b.addEventListener("click", () => { v.muted = !v.muted; b.textContent = v.muted ? "Som: desligado" : "Som: ligado"; v.play().catch(() => {}); });
         s.append(b);
       } else {
-        s.append(el("img", { src: base + ".webp", alt: `Peça ${p.n}, card ${i + 1}`, loading: i ? "lazy" : "eager", decoding: "async" }));
+        s.append(el("img", { src: base + ".webp", alt: `Peça ${p.n}, card ${i + 1}`, loading: "lazy", decoding: "async" }));
       }
       trilho.append(s);
     });
@@ -145,7 +358,6 @@ for (const p of PECAS) {
     const pontos = el("div", { class: "pontos", "aria-hidden": "true" });
     p.cards.forEach(() => pontos.append(el("i")));
     post.append(box, pontos);
-
     const atual = () => Math.round(trilho.scrollLeft / trilho.clientWidth);
     const ir = (i) => trilho.scrollTo({ left: i * trilho.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     const marcar = () => {
@@ -164,18 +376,86 @@ for (const p of PECAS) {
   }
   feed.append(post);
 }
-
-// Vídeos dos carrosséis só tocam (sem som) quando o carrossel está na tela; o Reels pausa ao sair da tela.
-const visivel = new Set();
+// vídeos dos carrosséis tocam sem som só com o carrossel na tela; os outros pausam ao sair da tela
 const obs = new IntersectionObserver((entradas) => {
   for (const en of entradas) {
     const box = en.target;
     if (en.isIntersecting) visivel.add(box); else visivel.delete(box);
-    if (box._marcar) box._marcar();
-    else if (!en.isIntersecting) box.querySelector("video")?.pause();
+    if (box._marcar) box._marcar(); else if (!en.isIntersecting) box.querySelector("video")?.pause();
   }
 }, { threshold: 0.6 });
-document.querySelectorAll(".midia").forEach((m) => obs.observe(m));
+document.querySelectorAll(".midia, .ig .quadro").forEach((m) => obs.observe(m));
+
+// ---------- painel ----------
+function barras(alvo, itens, classe = "") {
+  const max = Math.max(1, ...itens.map((i) => i.v));
+  alvo.innerHTML = itens.map((i) => `
+    <div class="degrau"><span class="nome">${i.nome}</span><span class="valor">${fmtN(i.v)}</span>
+      <div class="barra ${i.classe || classe}"><i style="width:${i.v ? Math.max(2, (i.v / max) * 100) : 0}%"></i></div></div>`).join("");
+}
+
+function montarPainel(d) {
+  const t = d.totais, c = d.campanha;
+  const st = document.getElementById("status");
+  st.className = "status " + c.status;
+  const msg = {
+    rascunho: ["Pronta, esperando ir ao ar", "Tudo montado e conferido. Os números começam a aparecer no dia em que a campanha for publicada."],
+    no_ar: ["No ar", c.inicio ? `Desde ${dataBR(c.inicio)} · R$ ${c.orcamento_dia} por dia` : `R$ ${c.orcamento_dia} por dia`],
+    pausada: ["Pausada", "Os anúncios não estão aparecendo no momento."],
+  }[c.status] || ["", ""];
+  st.innerHTML = `<span class="ponto" aria-hidden="true"></span><div><b>${msg[0]}</b><small>${msg[1]}</small></div>`;
+
+  document.getElementById("atualizado").textContent = "Atualizado em " + new Date(d.atualizado).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  document.getElementById("n-alcance").textContent = fmtN(t.alcance);
+  document.getElementById("n-leads").textContent = fmtN(t.leads);
+  document.getElementById("n-custo").textContent = t.leads ? fmtR(Math.round((t.investido / t.leads) * 100) / 100) : "–";
+  document.getElementById("n-investido").textContent = fmtR(Math.round(t.investido));
+  if (c.status === "no_ar" && c.inicio) {
+    const diasNoAr = Math.max(1, Math.ceil((new Date(d.atualizado) - new Date(c.inicio + "T00:00:00-03:00")) / 864e5));
+    document.getElementById("n-investido-sub").textContent = `investidos em ${diasNoAr} ${diasNoAr > 1 ? "dias" : "dia"}`;
+  }
+
+  barras(document.getElementById("funil"), [
+    { nome: "Viram o anúncio", v: t.alcance },
+    { nome: "Tocaram no anúncio", v: t.cliques },
+    { nome: "Pediram para visitar", v: t.leads },
+    { nome: "Visita marcada", v: d.andamento.visitas, classe: "verde" },
+    { nome: "Compraram", v: d.andamento.vendas, classe: "verde" },
+  ]);
+
+  const gd = document.getElementById("grafico-dias");
+  const dias = d.dias.slice(-14);
+  if (!dias.length) gd.innerHTML = `<div class="vazio">O gráfico aparece no primeiro dia de campanha no ar.</div>`;
+  else {
+    const max = Math.max(1, ...dias.map((x) => x.leads));
+    gd.innerHTML = `<div class="dias">${dias.map((x) => `<div class="dia" title="${dataBR(x.d)}: ${x.leads} interessados, ${fmtR(x.investido)}"><b>${x.leads || ""}</b><i style="height:calc(${(x.leads / max) * 100}% - ${(x.leads / max) * 18}px)"></i></div>`).join("")}</div>
+      <div class="eixo">${dias.map((x) => `<span>${dataBR(x.d)}</span>`).join("")}</div>`;
+  }
+
+  const rank = document.getElementById("rank");
+  const maxL = Math.max(1, ...d.anuncios.map((a) => a.leads));
+  rank.innerHTML = [...d.anuncios].sort((a, b) => b.leads - a.leads).map((a) => {
+    const info = ANUNCIOS.find((x) => x.id === a.id);
+    const custo = a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
+    return `<div class="rank-item"><img src="${info.thumb}" alt="">
+      <div class="info"><div class="linha"><span>${info.nome}</span><b>${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}</b></div>
+      <div class="barra"><i style="width:${a.leads ? (a.leads / maxL) * 100 : 0}%"></i></div>
+      <span class="nota">${custo} · ${fmtN(a.alcance)} pessoas viram</span></div></div>`;
+  }).join("");
+
+  const resp = document.getElementById("respostas");
+  const grupos = [["Qual andar interessa", d.respostas.andar], ["Quando quer visitar", d.respostas.quando], ["Como pretende pagar", d.respostas.pagar]];
+  resp.innerHTML = grupos.map(([t]) => `<div class="resp"><h3>${t}</h3><div class="funil"></div></div>`).join("");
+  resp.querySelectorAll(".funil").forEach((f, i) => barras(f, Object.entries(grupos[i][1]).map(([nome, v]) => ({ nome, v }))));
+  if (!t.leads) resp.insertAdjacentHTML("beforeend", `<div class="vazio">As respostas aparecem quando chegarem os primeiros interessados.</div>`);
+
+  document.getElementById("tempo").innerHTML = d.etapas.map((e) => `
+    <li class="${e.feito ? "" : "aberta"}"><span class="marca" aria-hidden="true">${e.feito ? "✓" : ""}</span>
+      <small>${e.data ? dataBR(e.data) : "Próximo passo"}</small><b>${e.titulo}</b><p>${e.texto}</p></li>`).join("");
+}
+
+fetch("dados.json", { cache: "no-store" }).then((r) => r.json()).then(montarPainel)
+  .catch(() => { document.getElementById("status").innerHTML = "<div><b>Não foi possível carregar os números agora.</b><small>Tente recarregar a página.</small></div>"; });
 </script>
 
 </body>
