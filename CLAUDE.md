@@ -28,7 +28,7 @@ Só `dist/public/` sobe; arquivos da raiz (este, `scripts/`, `.claude/`) nunca v
 
 ## Dados fixos (não inventar outros)
 
-- WhatsApp: `+55 (48) 99122-3600` → constante `whatsapp` em `App.tsx` (link `wa.me/5548991223600?text=...`). Atendimento: Leonardo S. Fioravanso.
+- WhatsApp: `+55 (51) 99506-3600` → constante `whatsapp` em `App.tsx` (link `wa.me/5551995063600?text=...`). Atendimento: Leonardo S. Fioravanso. É o mesmo número dos anúncios (trocado em 24/11/2026; o antigo (48) 99122-3600 não se usa mais).
 - E-mail: `fzmarau@gmail.com` · Instagram `@altavista_fz` · Facebook `altavista.marau.rs`
 - Endereço: Rua A, nº 46, Marau/RS · Fioravanso & Zanchet Ltda. · CNPJ 32.149.799/0001-79
 - Apartamento: 76,90 m² privativos (137,87 m² total), 2 dormitórios (1 suíte), 2 banheiros, sacada com churrasqueira, 2 vagas, elevador. Prédio pronto, documentação regular, com moradores. 20 unidades no total.
