@@ -280,7 +280,7 @@ declare global {
 }
 
 // GA4 é configurado com send_page_view: false no index.html; numa SPA o page_view é disparado aqui a cada troca de rota.
-// O Meta Pixel (init no index.html) recebe o PageView no mesmo ponto e um Contact a cada clique num link do WhatsApp.
+// O Meta Pixel (init no index.html) recebe o PageView no mesmo ponto e um Contact a cada clique num link do WhatsApp (que também avisa o Leonardo no Telegram, pelo n8n).
 function GaPageViewTracker() {
   const [location] = useLocation();
   useEffect(() => {
@@ -288,9 +288,20 @@ function GaPageViewTracker() {
     window.fbq?.("track", "PageView");
   }, [location]);
   useEffect(() => {
+    // origem do visitante (utm do anúncio), guardada na chegada porque a troca de rota perde a query
+    const q = new URLSearchParams(window.location.search);
+    const origem = q.get("utm_content") || q.get("utm_source");
+    try { if (origem) sessionStorage.setItem("av_origem", origem); } catch { /* navegação privada */ }
     const aoClicar = (e: MouseEvent) => {
       const link = (e.target as HTMLElement | null)?.closest?.("a[href*='wa.me']");
-      if (link) window.fbq?.("track", "Contact");
+      if (!link) return;
+      window.fbq?.("track", "Contact");
+      // aviso no Telegram do Leonardo (n8n AV-02), uma vez por visita; vai só a origem e a página, nenhum dado pessoal
+      try {
+        if (sessionStorage.getItem("av_avisou")) return;
+        sessionStorage.setItem("av_avisou", "1");
+        navigator.sendBeacon(`https://n8n.aetsolidez.com.br/webhook/av-toque-whatsapp?${new URLSearchParams({ origem: sessionStorage.getItem("av_origem") || "", pagina: window.location.pathname })}`);
+      } catch { /* sem aviso; o link do WhatsApp abre do mesmo jeito */ }
     };
     document.addEventListener("click", aoClicar);
     return () => document.removeEventListener("click", aoClicar);
