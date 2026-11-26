@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
-/* Página para os donos da construtora: painel da campanha (números em dados.json, atualizado 1x por dia),
+/* Página para os donos da construtora: painel da campanha (etapas em dados.json; números do Meta em dados-ao-vivo.json, gravado pela VPS de hora em hora),
    os anúncios no ar, as 8 peças e o caminho até aqui. Uma coluna estreita, como um feed de celular. */
 :root {
   color-scheme: dark;
@@ -202,6 +202,7 @@ footer strong { color: var(--fg); }
     <div class="cartao">
       <h3>Qual anúncio traz mais interessados</h3>
       <div class="rank" id="rank"></div>
+      <p class="nota" style="margin-top:12px">Nos dois anúncios que levam ao site, quem se interessa chama direto no WhatsApp da construtora e não entra nesta contagem. Por isso eles mostram quantas pessoas foram ao site.</p>
     </div>
 
     <div class="cartao">
@@ -214,37 +215,39 @@ footer strong { color: var(--fg); }
   <section id="anuncios">
     <div class="secao-top">
       <span class="rotulo">Anúncios no ar</span>
-      <h2>Os 3 anúncios da primeira rodada</h2>
-      <p class="nota">É assim que eles aparecem no celular. As outras peças entram nas próximas rodadas, trocando as que trouxerem menos interessados.</p>
+      <h2>Os 4 anúncios no ar</h2>
+      <p class="nota">É assim que eles aparecem no celular. Desde 26/11 cada anúncio tem a sua própria verba, de R$&nbsp;10 por dia, para a comparação entre eles ser justa. Dois abrem o formulário e dois levam ao site.</p>
     </div>
 
     <div class="cartao">
       <h3>Quem vê os anúncios</h3>
       <div class="quem">
         <svg class="alvo" viewBox="0 0 96 96" aria-hidden="true">
-          <circle cx="48" cy="48" r="44" fill="rgba(214,182,124,.08)" stroke="#d6b67c" stroke-dasharray="4 4"/>
-          <circle cx="48" cy="48" r="26" fill="rgba(214,182,124,.12)" stroke="rgba(214,182,124,.5)"/>
+          <circle cx="48" cy="48" r="44" fill="rgba(214,182,124,.12)" stroke="#d6b67c" stroke-dasharray="4 4"/>
           <circle cx="48" cy="48" r="6" fill="#d6b67c"/>
-          <text x="48" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#d6b67c" font-family="Manrope, sans-serif">60 km</text>
+          <text x="48" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#d6b67c" font-family="Manrope, sans-serif">5 km</text>
           <text x="48" y="66" text-anchor="middle" font-size="9" font-weight="700" fill="#f2eee8" font-family="Manrope, sans-serif">Marau</text>
         </svg>
         <div class="fatos">
-          <div><span aria-hidden="true">📍</span><span>Marau e cidades em volta, até <b>60 km</b> (Passo Fundo entra)</span></div>
-          <div><span aria-hidden="true">👥</span><span>Adultos de <b>18 a 65 anos</b></span></div>
+          <div><span aria-hidden="true">📍</span><span><b>Marau</b>: o centro e 5 km em volta, que cobre a cidade toda</span></div>
+          <div><span aria-hidden="true">📌</span><span>Pontos escolhidos nos bairros de maior renda de <b>Passo Fundo</b> e <b>Carazinho</b>, e no centro de <b>Casca, Vila Maria, Gentil, Nicolau Vergueiro e Camargo</b></span></div>
+          <div><span aria-hidden="true">👥</span><span>Adultos, <b>a partir de 18 anos</b></span></div>
           <div><span aria-hidden="true">📱</span><span>Facebook e Instagram: feed, stories e reels</span></div>
-          <div><span aria-hidden="true">💵</span><span><b>R$&nbsp;30 por dia</b> (cerca de R$&nbsp;900 por mês)</span></div>
+          <div><span aria-hidden="true">💵</span><span><b>R$&nbsp;40 por dia</b>: R$&nbsp;10 para cada anúncio (cerca de R$&nbsp;1.200 por mês)</span></div>
         </div>
       </div>
     </div>
 
     <div class="cartao">
       <h3>O que acontece quando a pessoa toca no anúncio</h3>
+      <p class="nota" style="margin-bottom:12px">Nos dois anúncios com formulário (Restam 4 e Pronto para morar):</p>
       <div class="passos">
         <div class="passo"><span class="n">1</span><b>Abre um formulário</b><span>Sem sair do Instagram ou do Facebook. Nome e telefone já vêm preenchidos.</span></div>
         <div class="passo"><span class="n">2</span><b>Responde 3 perguntas</b><span>Qual andar, quando quer visitar e como pretende pagar.</span></div>
         <div class="passo"><span class="n">3</span><b>Contato salvo</b><span>O interessado cai numa planilha da construtora. Ninguém se perde.</span></div>
         <div class="passo"><span class="n">4</span><b>Vai para o WhatsApp</b><span>Botão “Agendar visita no WhatsApp”, direto no (51) 99506-3600.</span></div>
       </div>
+      <p class="nota" style="margin-top:12px">Nos dois anúncios que levam ao site (R$&nbsp;82 mil de entrada e Juros da Caixa): o botão “Saiba mais” abre o altavistamarau.com.br, a pessoa vê os 4 apartamentos e chama no mesmo WhatsApp.</p>
     </div>
 
     <div id="lista-anuncios" style="display:flex;flex-direction:column;gap:28px"></div>
@@ -272,7 +275,7 @@ footer strong { color: var(--fg); }
   <footer>
     <div><strong>Oferta:</strong> 5º andar de R$ 510 mil por R$ 410 mil (entrada de R$ 82 mil) · 6º andar de R$ 515 mil por R$ 425 mil (entrada de R$ 85 mil). Valores de tabela de set/2026: R$ 513.299 e R$ 519.508.</div>
     <div><strong>Apartamentos:</strong> 502 e 504 no 5º andar · 601 e 604 no 6º andar. 2 dormitórios (1 suíte), sacada com churrasqueira, elevador e 2 vagas.</div>
-    <div><strong>Painel:</strong> os números são atualizados uma vez por dia. Visitas e vendas contam quando a construtora marca o interessado na planilha.</div>
+    <div><strong>Painel:</strong> os números dos anúncios são atualizados de hora em hora. Visitas e vendas contam quando a construtora marca o interessado na planilha.</div>
     <div>Imagens de interiores decorados: projeto da arquiteta Anaise Breda.</div>
   </footer>
 </div>
@@ -284,10 +287,13 @@ const ANUNCIOS = [
     texto: "Restam 4 apartamentos prontos no Alta Vista, em Marau: 5º andar de R$ 510 mil por R$ 410 mil. Suíte, sacada com churrasqueira, elevador e 2 vagas. Toca no botão, agenda a visita e fale direto com a construtora." },
   { id: "p3", nome: "R$ 82 mil de entrada", midia: "p3-card1", video: false, thumb: "media/p3-card1.webp",
     titulo: "R$ 82 mil de entrada",
-    texto: "O que R$ 82 mil de entrada compram em Marau? Um apartamento pronto no Alta Vista, de R$ 510 mil por R$ 410 mil: suíte, 2 banheiros, sacada com churrasqueira e 2 vagas. Restam 4. Toca no botão e agenda a visita." },
+    texto: "O que R$ 82 mil de entrada compram em Marau? Um apartamento pronto no Alta Vista, de R$ 510 mil por R$ 410 mil: suíte, 2 banheiros, sacada com churrasqueira e 2 vagas. Restam 4. Toca em Saiba mais e veja os 4 apartamentos.", botao: "Saiba mais" },
   { id: "p6", nome: "Pronto para morar", midia: "ad-p6", video: true, thumb: "media/ad-p6.webp",
     titulo: "Pronto para morar: R$ 410 mil no 5º",
     texto: "O Alta Vista já está pronto: tu visita e vê o apartamento de verdade. 5º andar de R$ 510 mil por R$ 410 mil. Escolhe o andar, assina e é só trazer a mudança. Restam 4. Toca no botão e agenda a visita. Interiores: projeto da arquiteta Anaise Breda." },
+  { id: "j1", nome: "Juros da Caixa", midia: "ad-j1", video: true, thumb: "media/ad-j1.webp", botao: "Saiba mais",
+    titulo: "Juros subiram. Na Caixa, ainda não.",
+    texto: "Os juros da casa própria subiram nos bancos privados. Na Caixa, ainda não: ela estuda subir, sem data. Quem fecha antes do reajuste contrata com a taxa de hoje.<br><br>No Alta Vista, em Marau, o apartamento está pronto: 5º andar de R$ 510 mil por R$ 410 mil. Suíte, sacada com churrasqueira, elevador e 2 vagas. Aceita financiamento pela Caixa e pelo Minha Casa Minha Vida.<br><br>Toca em Saiba mais, veja os 4 apartamentos e fale direto com a construtora.<br><br>Fontes: Abecip (30/10/2026), Banco Central (04/11/2026), Exame (13/11/2026). Financiamento sujeito à aprovação de crédito." },
 ];
 
 const PECAS = [
@@ -314,11 +320,11 @@ for (const a of ANUNCIOS) {
     ? `<video src="media/${a.midia}.mp4" poster="media/${a.midia}.webp" controls playsinline preload="metadata"></video>`
     : `<img src="media/${a.midia}.webp" alt="Anúncio ${a.nome}" loading="lazy">`;
   box.innerHTML = `
-    <span class="rotulo">Anúncio · ${a.nome}</span>
+    <span class="rotulo">Anúncio · ${a.nome} · ${a.botao ? "leva ao site" : "abre o formulário"}</span>
     <div class="ig">
       <div class="ig-top"><img src="media/placa.webp" alt=""><div>Res. Alta Vista - Marau/RS<small>Patrocinado</small></div></div>
       <div class="quadro">${quadro}</div>
-      <div class="ig-cta"><span>${a.titulo}</span><span class="bt">Entrar em contato</span></div>
+      <div class="ig-cta"><span>${a.titulo}</span><span class="bt">${a.botao || "Entrar em contato"}</span></div>
       <div class="ig-texto"><b>altavistamarau</b>${a.texto}</div>
     </div>`;
   lista.append(box);
@@ -330,7 +336,7 @@ const visivel = new Set();
 for (const p of PECAS) {
   const post = el("article", { class: "post", id: "peca-" + p.n });
   post.append(el("div", { class: "post-top" }, `<span class="rotulo">Peça ${p.n} · ${p.tipo}</span><h3>${p.titulo}</h3><p>${p.texto}</p>`));
-  if (p.noar) post.append(el("span", { class: "selo" }, "Na primeira rodada"));
+  if (p.noar) post.append(el("span", { class: "selo" }, "No ar"));
   if (p.reel) {
     const box = el("div", { class: "midia reel" });
     box.append(el("video", { src: `media/${p.reel}.mp4`, poster: `media/${p.reel}.webp`, controls: "", playsinline: "", preload: "metadata" }));
@@ -434,11 +440,12 @@ function montarPainel(d) {
 
   const rank = document.getElementById("rank");
   const maxL = Math.max(1, ...d.anuncios.map((a) => a.leads));
-  rank.innerHTML = [...d.anuncios].sort((a, b) => b.leads - a.leads).map((a) => {
+  rank.innerHTML = d.anuncios.filter((a) => ANUNCIOS.some((x) => x.id === a.id)).sort((a, b) => b.leads - a.leads).map((a) => {
     const info = ANUNCIOS.find((x) => x.id === a.id);
-    const custo = a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
+    const custo = info.botao ? `leva ao site · ${fmtR(a.investido)} investidos` : a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
+    const feito = info.botao ? `${fmtN(a.cliques)} ${a.cliques === 1 ? "foi" : "foram"} ao site` : `${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}`;
     return `<div class="rank-item"><img src="${info.thumb}" alt="">
-      <div class="info"><div class="linha"><span>${info.nome}</span><b>${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}</b></div>
+      <div class="info"><div class="linha"><span>${info.nome}</span><b>${feito}</b></div>
       <div class="barra"><i style="width:${a.leads ? (a.leads / maxL) * 100 : 0}%"></i></div>
       <span class="nota">${custo} · ${fmtN(a.alcance)} pessoas viram</span></div></div>`;
   }).join("");
