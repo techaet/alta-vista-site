@@ -53,3 +53,22 @@
 .sold-progress-bar{height:6px;background:var(--cream);overflow:hidden}
 .sold-progress-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--champagne-deep),var(--champagne))}
 @media (max-width:900px){.availability-cta{align-items:flex-start}}
+
+/* Formulário de lead (nome + WhatsApp + andar) e a janela que abre depois do toque no WhatsApp */
+.lead-form{display:grid;gap:12px;margin-top:28px;padding:22px;background:var(--white);color:var(--ink);border:1px solid var(--line);max-width:460px}
+.lead-form>strong{font:600 26px/1.05 var(--serif)}
+.lead-form p,.contact-band .lead-form p{margin:0;color:var(--muted);font-size:13px}
+.lead-form label{display:grid;gap:5px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--graphite-2)}
+.lead-form input,.lead-form select{width:100%;min-height:46px;padding:0 12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:500 16px var(--sans);border-radius:0}
+.lead-form input:focus-visible,.lead-form select:focus-visible{outline:2px solid var(--champagne-deep);outline-offset:1px}
+.lead-form button{width:100%}.lead-form button:disabled{opacity:.6}
+.lead-form small{color:var(--muted);font-size:11px}.lead-form small a,.lead-form p a{text-decoration:underline}
+.lead-isca{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.lead-erro,.contact-band .lead-form .lead-erro{color:#9b2c2c}
+.lead-ok{grid-template-columns:auto 1fr;align-items:start;color:#147c44}.lead-ok strong{color:var(--ink);font:600 24px/1.1 var(--serif)}
+.lead-fundo{position:fixed;inset:0;z-index:50;background:rgba(20,21,19,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.lead-folha{position:relative;width:100%;max-width:460px;max-height:calc(100dvh - 32px);overflow:auto}
+.lead-folha .lead-form{margin:0;max-width:none}
+.lead-fechar{position:absolute;top:10px;right:10px;z-index:1;width:40px;height:40px;display:grid;place-items:center;border:0;background:transparent;color:var(--ink);cursor:pointer}
+@media (min-width:700px){.lead-fundo{align-items:center}}
+@media (max-width:900px){.contact-grid{grid-template-columns:1fr;gap:28px}.contact-band .lead-form{max-width:none}}

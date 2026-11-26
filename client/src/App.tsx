@@ -176,6 +176,69 @@ function SoldProgress() {
 function Layout({ children }: { children: React.ReactNode }) { return <><Header /><a className="floating-whatsapp" href={whatsapp} target="_blank" rel="noreferrer" aria-label="Falar com a construtora pelo WhatsApp"><MessageCircle size={20} /><span>WhatsApp</span></a>{children}<Footer /></>; }
 function Eyebrow({ children }: { children: React.ReactNode }) { return <p className="eyebrow">{children}</p>; }
 function SectionTitle({ eyebrow, title, copy, align = "left" }: { eyebrow: string; title: string; copy?: string; align?: "left" | "right" }) { return <div className={`section-title align-${align}`}><Eyebrow>{eyebrow}</Eyebrow><h2>{title}</h2>{copy && <p>{copy}</p>}</div>; }
+const LEAD_URL = "https://n8n.aetsolidez.com.br/webhook/av-lead-site";
+const lerSessao = (k: string) => { try { return sessionStorage.getItem(k) || ""; } catch { return ""; } };
+const gravarSessao = (k: string) => { try { sessionStorage.setItem(k, "1"); } catch { /* navegação privada */ } };
+
+// Formulário curto: grava na mesma planilha do formulário do Meta (n8n AV-03), e o aviso do Telegram sai pelo AV-01.
+function LeadForm({ momento, titulo = "Prefere que a gente te chame?", texto = "Deixe nome e WhatsApp: a construtora te chama hoje mesmo.", onPronto }: { momento: string; titulo?: string; texto?: string; onPronto?: () => void }) {
+  const [estado, setEstado] = useState<"livre" | "enviando" | "ok" | "erro">(() => (lerSessao("av_lead") ? "ok" : "livre"));
+  const id = `lead-${momento}`;
+  async function enviar(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const dados = new FormData(e.currentTarget);
+    dados.set("origem", lerSessao("av_origem"));
+    dados.set("momento", momento);
+    setEstado("enviando");
+    try {
+      // form-urlencoded não dispara pré-verificação de CORS
+      const r = await fetch(LEAD_URL, { method: "POST", body: new URLSearchParams(dados as unknown as Record<string, string>) });
+      if (!r.ok) throw new Error(String(r.status));
+      gravarSessao("av_lead");
+      window.fbq?.("track", "Lead");
+      window.gtag?.("event", "generate_lead", { method: momento });
+      setEstado("ok");
+      onPronto?.();
+    } catch { setEstado("erro"); }
+  }
+  if (estado === "ok") return <div className="lead-form lead-ok" role="status"><Check size={20} /><div><strong>Recebido!</strong><p>A construtora vai te chamar no WhatsApp. Se preferir, ligue para <a href="tel:+5551995063600">(51) 99506-3600</a>.</p></div></div>;
+  return <form className="lead-form" onSubmit={enviar} aria-labelledby={`${id}-titulo`}>
+    <strong id={`${id}-titulo`}>{titulo}</strong><p>{texto}</p>
+    <label>Nome<input name="nome" autoComplete="name" required minLength={2} maxLength={80} /></label>
+    <label>WhatsApp com DDD<input name="telefone" type="tel" inputMode="tel" autoComplete="tel-national" required minLength={10} maxLength={20} placeholder="(54) 99999-9999" /></label>
+    <label>Qual andar te interessa?<select name="andar" defaultValue=""><option value="">Ainda não sei</option><option>5º andar</option><option>6º andar</option><option>Tanto faz</option></select></label>
+    <input className="lead-isca" name="site_url" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+    <button className="button button-champagne" disabled={estado === "enviando"}>{estado === "enviando" ? "Enviando…" : "Quero ser chamado"}</button>
+    {estado === "erro" && <p className="lead-erro" role="alert">Não conseguimos enviar agora. Ligue ou chame no <a href="tel:+5551995063600">(51) 99506-3600</a>.</p>}
+    <small>Usamos seus dados só para falar sobre o Alta Vista. <Link href="/privacidade">Política de privacidade</Link>.</small>
+  </form>;
+}
+
+// Quem toca no WhatsApp e volta ao site (o WhatsApp não abriu ou a pessoa desistiu) encontra o formulário. Uma vez por visita.
+function LeadDepoisDoWhatsApp() {
+  const [aberta, setAberta] = useState(false);
+  useEffect(() => {
+    let t: number | undefined;
+    const abrir = () => { if (lerSessao("av_folha") || lerSessao("av_lead")) return; gravarSessao("av_folha"); t = window.setTimeout(() => setAberta(true), 1500); };
+    window.addEventListener("av:toque-whatsapp", abrir);
+    return () => { window.removeEventListener("av:toque-whatsapp", abrir); clearTimeout(t); };
+  }, []);
+  useEffect(() => {
+    if (!aberta) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setAberta(false); };
+    document.addEventListener("keydown", esc);
+    (document.querySelector(".lead-folha input[name=nome]") as HTMLInputElement | null)?.focus();
+    return () => document.removeEventListener("keydown", esc);
+  }, [aberta]);
+  if (!aberta) return null;
+  return <div className="lead-fundo" onClick={e => { if (e.target === e.currentTarget) setAberta(false); }}>
+    <div className="lead-folha" role="dialog" aria-modal="true" aria-label="Deixe seu contato">
+      <button className="lead-fechar" type="button" onClick={() => setAberta(false)} aria-label="Fechar"><X size={18} /></button>
+      <LeadForm momento="depois-do-whatsapp" titulo="O WhatsApp não abriu?" texto="Deixe nome e WhatsApp que a construtora te chama hoje mesmo." />
+    </div>
+  </div>;
+}
+
 function WhatsAppButton({ children = "Falar com a construtora", className = "button button-dark" }: { children?: React.ReactNode; className?: string }) { return <a className={className} href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={17} />{children}</a>; }
 
 const homeLd = [{
@@ -220,7 +283,7 @@ function Home() {
     <section className="vista-band"><div className="vista-copy"><Eyebrow>VISTA PARA A CIDADE</Eyebrow><h2>Uma pausa entre o movimento e o horizonte.</h2><p>Nos apartamentos voltados para os fundos, a sacada abre uma perspectiva especial para a cidade — um cenário para começar e terminar o dia.</p><Link href="/localizacao" className="button button-light">Conheça a localização <ArrowUpRight size={16} /></Link></div><div className="vista-image" style={{ backgroundImage: `url(${vista})` }} /></section>
     <section className="availability section-pad"><div className="container"><div className="availability-head"><SectionTitle eyebrow="DISPONIBILIDADE" title={`${capitalize(numWords.f[units.length])} oportunidades para escolher com calma.`} copy="Todas as unidades anunciadas estão prontas. Consulte a tabela comercial completa e fale diretamente com a construtora." /><div className="availability-cta"><ScarcityBadge /><Link href="/disponibilidade" className="arrow-link">Ver todas as unidades <ArrowUpRight size={17} /></Link></div></div><div className="unit-strip">{units.map(unit => <Link href={`/disponibilidade#${unit.id}`} className="unit-card" key={unit.id}><span className="unit-id">{unit.id}</span><span className="unit-floor">{unit.floor}</span><span className="unit-old-price">De {unit.listPrice}</span><strong>{unit.price}</strong><span className="unit-arrow"><ArrowUpRight size={16} /></span></Link>)}</div></div></section>
     <section className="blog-preview section-pad"><div className="container"><div className="blog-head"><SectionTitle eyebrow="DO BLOG" title="Escolher um imóvel também é escolher uma forma de viver." /><Link href="/blog" className="arrow-link">Ver todos os artigos <ArrowUpRight size={17} /></Link></div><div className="article-grid">{articles.slice(0, 3).map((article, i) => <ArticleCard article={article} featured={i === 0} key={article.slug} />)}</div></div></section>
-    <section className="contact-band"><div className="container contact-grid"><div><Eyebrow>VISITE O ALTA VISTA</Eyebrow><h2>Seu próximo endereço pode começar com uma conversa.</h2></div><div><p>Leonardo S. Fioravanso está pronto para apresentar as unidades, a planta e as condições comerciais.</p><WhatsAppButton className="button button-champagne">Chamar no WhatsApp <ArrowUpRight size={17} /></WhatsAppButton></div></div></section>
+    <section className="contact-band"><div className="container contact-grid"><div><Eyebrow>VISITE O ALTA VISTA</Eyebrow><h2>Seu próximo endereço pode começar com uma conversa.</h2></div><div><p>Leonardo S. Fioravanso está pronto para apresentar as unidades, a planta e as condições comerciais.</p><WhatsAppButton className="button button-champagne">Chamar no WhatsApp <ArrowUpRight size={17} /></WhatsAppButton><LeadForm momento="inicio" /></div></div></section>
   </main></Layout>;
 }
 
@@ -270,8 +333,8 @@ function ArticleView({ article }: { article: Article }) {
   return <Layout><article className="article-page"><div className="article-cover" style={{ backgroundImage: `url(${article.image})` }}><div className="article-cover-overlay" /><div className="container article-cover-content"><Eyebrow>{article.category}</Eyebrow><h1>{article.title}</h1><span>{article.date} · Residencial Alta Vista</span></div></div><div className="container article-body"><div className="article-prose" dangerouslySetInnerHTML={{ __html: article.html }} /><aside className="article-aside"><Eyebrow>LEIA TAMBÉM</Eyebrow>{related.map(r => <Link href={r.href} key={r.href}>{r.title}<ArrowUpRight size={15} /></Link>)}</aside></div></article></Layout>;
 }
 
-function ContactPage() { useDocumentMeta("Contato | Residencial Alta Vista", "Fale com a Construtora Fioravanso e Zanchet pelo WhatsApp, telefone ou e-mail e agende uma visita ao Residencial Alta Vista em Marau/RS.", "/contato"); return <Layout><PageHero kind="contato" eyebrow="CONTATO" title="Vamos conversar sobre o seu próximo endereço." copy="Leonardo S. Fioravanso atende pelo WhatsApp, e-mail e redes sociais da construtora." image={interior} /><section className="section-pad contact-page"><div className="container contact-detail"><div><Eyebrow>ATENDIMENTO COMERCIAL</Eyebrow><h2>Uma conversa objetiva para encontrar a unidade certa.</h2><p>Agende uma visita, tire dúvidas sobre a planta ou consulte as condições de pagamento diretamente com a construtora.</p><WhatsAppButton className="button button-dark">Chamar no WhatsApp <MessageCircle size={17} /></WhatsAppButton></div><div className="contact-card"><span className="contact-avatar">LF</span><strong>Leonardo S. Fioravanso</strong><small>Gerente comercial</small><a href="tel:+5551995063600">+55 (51) 99506-3600</a><a href="mailto:fzmarau@gmail.com">fzmarau@gmail.com</a><a href="https://www.instagram.com/altavista_fz/" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={15} /></a><a href="https://www.facebook.com/altavista.marau.rs" target="_blank" rel="noreferrer">Facebook <ArrowUpRight size={15} /></a></div></div></section></Layout>; }
-function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial Alta Vista", "Como a Construtora Fioravanso e Zanchet trata os dados de contato dos visitantes do site do Residencial Alta Vista.", "/privacidade"); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>TRANSPARÊNCIA</Eyebrow><h1>Política de privacidade</h1><p>Este site utiliza links de contato para facilitar o atendimento da Construtora Fioravanso e Zanchet Ltda. Ao iniciar uma conversa por WhatsApp, e-mail ou rede social, os dados passam a ser tratados pela respectiva plataforma e pela construtora para fins de atendimento comercial.</p><p>O site não possui formulário próprio nem área autenticada. Para medir as visitas e mostrar anúncios do Residencial Alta Vista, usamos o Google Analytics e o pixel da Meta (Facebook e Instagram), que registram dados de navegação de forma anônima por meio de cookies. Para dúvidas sobre o uso de dados, entre em contato pelo e-mail fzmarau@gmail.com.</p></div></section></Layout>; }
+function ContactPage() { useDocumentMeta("Contato | Residencial Alta Vista", "Fale com a Construtora Fioravanso e Zanchet pelo WhatsApp, telefone ou e-mail e agende uma visita ao Residencial Alta Vista em Marau/RS.", "/contato"); return <Layout><PageHero kind="contato" eyebrow="CONTATO" title="Vamos conversar sobre o seu próximo endereço." copy="Leonardo S. Fioravanso atende pelo WhatsApp, e-mail e redes sociais da construtora." image={interior} /><section className="section-pad contact-page"><div className="container contact-detail"><div><Eyebrow>ATENDIMENTO COMERCIAL</Eyebrow><h2>Uma conversa objetiva para encontrar a unidade certa.</h2><p>Agende uma visita, tire dúvidas sobre a planta ou consulte as condições de pagamento diretamente com a construtora.</p><WhatsAppButton className="button button-dark">Chamar no WhatsApp <MessageCircle size={17} /></WhatsAppButton><LeadForm momento="contato" /></div><div className="contact-card"><span className="contact-avatar">LF</span><strong>Leonardo S. Fioravanso</strong><small>Gerente comercial</small><a href="tel:+5551995063600">+55 (51) 99506-3600</a><a href="mailto:fzmarau@gmail.com">fzmarau@gmail.com</a><a href="https://www.instagram.com/altavista_fz/" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={15} /></a><a href="https://www.facebook.com/altavista.marau.rs" target="_blank" rel="noreferrer">Facebook <ArrowUpRight size={15} /></a></div></div></section></Layout>; }
+function PrivacyPage() { useDocumentMeta("Política de Privacidade | Residencial Alta Vista", "Como a Construtora Fioravanso e Zanchet trata os dados de contato dos visitantes do site do Residencial Alta Vista.", "/privacidade"); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>TRANSPARÊNCIA</Eyebrow><h1>Política de privacidade</h1><p>Este site utiliza links de contato para facilitar o atendimento da Construtora Fioravanso e Zanchet Ltda. Ao iniciar uma conversa por WhatsApp, e-mail ou rede social, os dados passam a ser tratados pela respectiva plataforma e pela construtora para fins de atendimento comercial.</p><p>Quem quiser ser chamado pode deixar nome, telefone (WhatsApp) e o andar de interesse no formulário do site. Esses dados são usados só para a construtora entrar em contato sobre o Residencial Alta Vista, ficam numa planilha de acesso restrito da construtora (Google Planilhas) e são guardados enquanto durar o atendimento, por no máximo 12 meses. Para corrigir ou apagar seus dados, escreva para fzmarau@gmail.com.</p><p>O site não possui área autenticada. Para medir as visitas e mostrar anúncios do Residencial Alta Vista, usamos o Google Analytics e o pixel da Meta (Facebook e Instagram), que registram dados de navegação de forma anônima por meio de cookies. Para dúvidas sobre o uso de dados, entre em contato pelo e-mail fzmarau@gmail.com.</p></div></section></Layout>; }
 function PageHero({ kind = "default", eyebrow, title, copy, image }: { kind?: string; eyebrow: string; title: string; copy: string; image: string }) { return <section className={`page-hero page-hero-${kind}`}><img className="page-hero-image" src={image} alt="" fetchPriority="high" decoding="async" /><div className="page-hero-overlay" /><div className="page-hero-rule" /><div className="container page-hero-content"><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1><p>{copy}</p></div></section>; }
 function NotFound() { useDocumentMeta("Página não encontrada | Residencial Alta Vista", "O endereço que você tentou acessar não está disponível.", "/404"); useNoindex(); return <Layout><section className="simple-page section-pad"><div className="container narrow"><Eyebrow>404</Eyebrow><h1>Essa página saiu da planta.</h1><p>O endereço que você tentou acessar não está disponível.</p><Link href="/" className="button button-dark">Voltar ao início <ArrowUpRight size={16} /></Link></div></section></Layout>; }
 
@@ -296,6 +359,7 @@ function GaPageViewTracker() {
       const link = (e.target as HTMLElement | null)?.closest?.("a[href*='wa.me']");
       if (!link) return;
       window.fbq?.("track", "Contact");
+      window.dispatchEvent(new Event("av:toque-whatsapp"));
       // aviso no Telegram do Leonardo (n8n AV-02), uma vez por visita; vai só a origem e a página, nenhum dado pessoal
       try {
         if (sessionStorage.getItem("av_avisou")) return;
@@ -309,4 +373,4 @@ function GaPageViewTracker() {
   return null;
 }
 
-export default function App() { return <><GaPageViewTracker /><Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch></>; }
+export default function App() { return <><GaPageViewTracker /><LeadDepoisDoWhatsApp /><Switch><Route path="/" component={Home} /><Route path="/residencial" component={InteriorPage} /><Route path="/apartamentos" component={ApartmentsPage} /><Route path="/disponibilidade" component={AvailabilityPage} /><Route path="/localizacao" component={LocationPage} /><Route path="/materiais" component={MaterialsPage} /><Route path="/blog" component={BlogPage} /><Route path="/blog/:slug">{params => <ArticlePage slug={params.slug} />}</Route><Route path="/contato" component={ContactPage} /><Route path="/privacidade" component={PrivacyPage} /><Route component={NotFound} /></Switch></>; }
