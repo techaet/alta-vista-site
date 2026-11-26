@@ -202,7 +202,7 @@ footer strong { color: var(--fg); }
     <div class="cartao">
       <h3>Qual anúncio traz mais interessados</h3>
       <div class="rank" id="rank"></div>
-      <p class="nota" style="margin-top:12px">Nos dois anúncios que levam ao site, quem se interessa chama direto no WhatsApp da construtora e não entra nesta contagem. Por isso eles mostram quantas pessoas foram ao site.</p>
+      <p class="nota" style="margin-top:12px">Nos dois anúncios que levam ao site, quem se interessa chama direto no WhatsApp da construtora e não entra nesta contagem. Por isso eles mostram quantas pessoas tocaram no anúncio.</p>
     </div>
 
     <div class="cartao">
@@ -443,7 +443,7 @@ function montarPainel(d) {
   rank.innerHTML = d.anuncios.filter((a) => ANUNCIOS.some((x) => x.id === a.id)).sort((a, b) => b.leads - a.leads).map((a) => {
     const info = ANUNCIOS.find((x) => x.id === a.id);
     const custo = info.botao ? `leva ao site · ${fmtR(a.investido)} investidos` : a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
-    const feito = info.botao ? `${fmtN(a.cliques)} ${a.cliques === 1 ? "foi" : "foram"} ao site` : `${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}`;
+    const feito = info.botao ? `${fmtN(a.cliques)} ${a.cliques === 1 ? "tocou" : "tocaram"} no anúncio` : `${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}`;
     return `<div class="rank-item"><img src="${info.thumb}" alt="">
       <div class="info"><div class="linha"><span>${info.nome}</span><b>${feito}</b></div>
       <div class="barra"><i style="width:${a.leads ? (a.leads / maxL) * 100 : 0}%"></i></div>
