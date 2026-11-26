@@ -183,7 +183,7 @@ footer strong { color: var(--fg); }
 
     <div class="numeros">
       <div class="num"><span class="ico" aria-hidden="true">👀</span><strong id="n-alcance">0</strong><span>pessoas viram o anúncio</span></div>
-      <div class="num destaque"><span class="ico" aria-hidden="true">🙋</span><strong id="n-leads">0</strong><span>pediram para visitar (deixaram nome e telefone)</span></div>
+      <div class="num destaque"><span class="ico" aria-hidden="true">🙋</span><strong id="n-leads">0</strong><span>interessados (preencheram o formulário ou tocaram no WhatsApp do site)</span></div>
       <div class="num"><span class="ico" aria-hidden="true">🏷️</span><strong id="n-custo">–</strong><span>custo de cada interessado</span></div>
       <div class="num"><span class="ico" aria-hidden="true">💰</span><strong id="n-investido">R$ 0</strong><span id="n-investido-sub">investidos até agora</span></div>
     </div>
@@ -202,7 +202,7 @@ footer strong { color: var(--fg); }
     <div class="cartao">
       <h3>Qual anúncio traz mais interessados</h3>
       <div class="rank" id="rank"></div>
-      <p class="nota" style="margin-top:12px">Nos dois anúncios que levam ao site, quem se interessa chama direto no WhatsApp da construtora e não entra nesta contagem. Por isso eles mostram quantas pessoas tocaram no anúncio.</p>
+      <p class="nota" style="margin-top:12px">Nos dois anúncios com formulário, interessado é quem deixou nome e telefone. Nos dois que levam ao site, é quem tocou no botão de WhatsApp do site.</p>
     </div>
 
     <div class="cartao">
@@ -275,7 +275,7 @@ footer strong { color: var(--fg); }
   <footer>
     <div><strong>Oferta:</strong> 5º andar de R$ 510 mil por R$ 410 mil (entrada de R$ 82 mil) · 6º andar de R$ 515 mil por R$ 425 mil (entrada de R$ 85 mil). Valores de tabela de set/2026: R$ 513.299 e R$ 519.508.</div>
     <div><strong>Apartamentos:</strong> 502 e 504 no 5º andar · 601 e 604 no 6º andar. 2 dormitórios (1 suíte), sacada com churrasqueira, elevador e 2 vagas.</div>
-    <div><strong>Painel:</strong> os números dos anúncios são atualizados de hora em hora. Visitas e vendas contam quando a construtora marca o interessado na planilha.</div>
+    <div><strong>Painel:</strong> os números dos anúncios são atualizados de hora em hora. Interessado é quem preenche o formulário ou, vindo de um anúncio, toca no botão de WhatsApp do site. Visitas e vendas contam quando a construtora marca o interessado na planilha.</div>
     <div>Imagens de interiores decorados: projeto da arquiteta Anaise Breda.</div>
   </footer>
 </div>
@@ -424,7 +424,7 @@ function montarPainel(d) {
   barras(document.getElementById("funil"), [
     { nome: "Viram o anúncio", v: t.alcance },
     { nome: "Tocaram no anúncio", v: t.cliques },
-    { nome: "Pediram para visitar", v: t.leads },
+    { nome: "Interessados", v: t.leads },
     { nome: "Visita marcada", v: d.andamento.visitas, classe: "verde" },
     { nome: "Compraram", v: d.andamento.vendas, classe: "verde" },
   ]);
@@ -442,12 +442,12 @@ function montarPainel(d) {
   const maxL = Math.max(1, ...d.anuncios.map((a) => a.leads));
   rank.innerHTML = d.anuncios.filter((a) => ANUNCIOS.some((x) => x.id === a.id)).sort((a, b) => b.leads - a.leads).map((a) => {
     const info = ANUNCIOS.find((x) => x.id === a.id);
-    const custo = info.botao ? `leva ao site · ${fmtR(a.investido)} investidos` : a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
-    const feito = info.botao ? `${fmtN(a.cliques)} ${a.cliques === 1 ? "tocou" : "tocaram"} no anúncio` : `${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}`;
+    const custo = a.leads ? `${fmtR(Math.round((a.investido / a.leads) * 100) / 100)} cada` : "sem interessados ainda";
+    const feito = `${a.leads} ${a.leads === 1 ? "interessado" : "interessados"}`;
     return `<div class="rank-item"><img src="${info.thumb}" alt="">
       <div class="info"><div class="linha"><span>${info.nome}</span><b>${feito}</b></div>
       <div class="barra"><i style="width:${a.leads ? (a.leads / maxL) * 100 : 0}%"></i></div>
-      <span class="nota">${custo} · ${fmtN(a.alcance)} pessoas viram</span></div></div>`;
+      <span class="nota">${info.botao ? "site" : "formulário"} · ${custo} · ${fmtN(a.alcance)} pessoas viram</span></div></div>`;
   }).join("");
 
   const resp = document.getElementById("respostas");
